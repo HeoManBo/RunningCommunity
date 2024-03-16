@@ -9,7 +9,6 @@ import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Board {
 
@@ -26,16 +25,16 @@ public class Board {
     private Member member;
 
     @ColumnDefault("0")
-    private int like;
+    private int up;
 
     @ColumnDefault("0")
-    private int dislike;
+    private int down;
 
     public Board(String content, String title, Member member) {
         this.content = content;
         this.title = title;
         this.member = member;
-        this.like = 0;
-        this.dislike = 0;
+        this.up = 0;
+        this.down = 0;
     }
 }

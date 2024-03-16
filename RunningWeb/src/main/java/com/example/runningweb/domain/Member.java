@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
@@ -30,7 +29,6 @@ public class Member extends BaseEntity {
     private String email;
 
 
-    @Builder
     public Member(String userName, String password, String nickname, String email) {
         this.userName = userName;
         this.password = password;
