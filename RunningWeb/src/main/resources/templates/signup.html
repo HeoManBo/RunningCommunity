@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 50%
+        }
+
+        form input[type="text"],
+        form input[type="password"],
+        form input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        form input[type="submit"] {
+            width: 100%;
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!--<div th:replace="/fragment/header.html" ></div>-->
+
+    <form th:action="@{/signup}" th:object="${memberDTO}" method="POST">
+        <h2>회원가입</h2>
+        <input type="text" name="username" placeholder="아이디 : 8자에서 16자" th:field="*{id}"  required>
+        <input type="password" name="password" placeholder="비밀번호 " th:field="*{password}" required>
+        <input type="text" name="nickname" placeholder="닉네임 : 8자" th:field="*{nickname}"  required>
+        <input type="email" name="email" placeholder="아이디/비밀번호 찾기시 이용할 이메일" th:field="*{email}" required>
+        <input type="submit" value="가입하기">
+    </form>
+
+</body>
+</html>
