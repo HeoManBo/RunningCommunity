@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logout Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 100px;
+    }
+    h1 {
+      color: #333;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<h1>로그아웃 하시겠습니까?</h1>
+<button onclick="logout()">로그아웃</button>
+
+<script>
+  function logout() {
+    // 로그아웃 프로세스 구현
+    // 예시: 세션 데이터 삭제, 로그인 페이지로 리디렉션 등
+    alert("로그아웃 되었습니다.");
+    window.location.href = "login.html"; // 로그인 페이지로 이동
+  }
+</script>
+</body>
+</html>

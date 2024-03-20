@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -24,15 +25,19 @@ public class SecurityConfig {
         //허용 접근 URL
         http.authorizeHttpRequests(
                 request ->{
-                    request.requestMatchers("/", "/main", "/signup", "/login", "/error").permitAll();
+                    request.requestMatchers("/", "/main", "/signup", "/login", "/error", "/logout").permitAll();
                 }
         );
 
         http.formLogin(config -> {
-            config.defaultSuccessUrl("/main");
+            config.defaultSuccessUrl("/main"); //성공시 rediect 페이지
+            config.loginPage("/login"); //로그인 홈페이지로 연결
+            config.loginProcessingUrl("/login"); // post login 전달 (스프링 시큐리티가 내부적으로 처리)
         }).logout(
                 config -> {
-                    config.logoutSuccessUrl("/main");
+                    config.logoutRequestMatcher(new AntPathRequestMatcher("/logout")); //모든 logout 메소드에 대해 처리
+                    config.logoutSuccessUrl("/main"); //성공시
+                    config.invalidateHttpSession(true); // 캐시 삭제
                 }
         );
 

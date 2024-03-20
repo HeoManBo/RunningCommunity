@@ -43,16 +43,26 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
+        .fieldError{
+            color: red;
+        }
+
     </style>
 </head>
 <body>
     <!--<div th:replace="/fragment/header.html" ></div>-->
 
-    <form th:action="@{/signup}" th:object="${memberDTO}" method="POST">
+    <form th:action="@{/signup}" th:object="${memberDto}" method="POST">
         <h2>회원가입</h2>
-        <input type="text" name="username" placeholder="아이디 : 8자에서 16자" th:field="*{id}"  required>
+        <div th:if="${#fields.hasErrors('id')}">
+            <p class="fieldError">이미 존재하는 아이디입니다.</p>
+        </div>
+        <input type="text" name="id" placeholder="아이디 : 최대 16자" th:field="*{id}"  required>
         <input type="password" name="password" placeholder="비밀번호 " th:field="*{password}" required>
-        <input type="text" name="nickname" placeholder="닉네임 : 8자" th:field="*{nickname}"  required>
+        <input type="password" name="password_check" placeholder="비밀번호 확인" th:field="*{password_check}" required>
+        <p th:if="${#fields.hasErrors('password_check')}" class="fieldError"> 비밀번호가 일치하지 않습니다. </p>
+        <input type="text" name="nickname" placeholder="닉네임 : 최대 8자" th:field="*{nickname}"  required>
         <input type="email" name="email" placeholder="아이디/비밀번호 찾기시 이용할 이메일" th:field="*{email}" required>
         <input type="submit" value="가입하기">
     </form>

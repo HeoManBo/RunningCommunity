@@ -18,6 +18,12 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public Long save(MemberDto memberDto){
+        //중복 체크
+        Member duplicatedCheck = memberRepository.findByUsername(memberDto.getId());
+        if(duplicatedCheck != null){
+            throw new IllegalArgumentException("중복되는 아이디 입니다.");
+        }
+
         Member member = Member.builder()
                 .userName(memberDto.getId())
                 .nickname(memberDto.getNickname())

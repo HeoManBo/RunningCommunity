@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <style>
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #000;
+      padding: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #000;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    div {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    a {
+      color: #000;
+      text-decoration: none;
+    }
+  </style>
+    <meta charset="UTF-8">
+    <title>login</title>
+</head>
+<body>
+  <form th:action="@{/login}" th:object="${loginDto}" method="post">
+    <div th:if="${param.error}">
+      <div class="alert alert-danger">
+        아이디 혹은 비밀번호를 확인해 주세요.
+      </div>
+    </div>
+    <input type="text" th:field="*{username}" placeholder="아이디를 입력하세요">
+    <input type="password" th:field="*{password}" placeholder="비밀번호를 입력하세요">
+    <button type="submit">로그인</button>
+    <div>
+      <a href="#">find Email</a>
+      <a href="#">find password</a>
+    </div>
+</form>
+</body>
+</html>
