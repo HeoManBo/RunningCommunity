@@ -6,15 +6,33 @@
 </head>
 <body>
     <div th:replace="~{/fragment/header.html}" ></div>
-  <h1>
-    RUNNING PROJECT!!!!!!!!!!!!
-  </h1>
+    <button sec:authorize="isAuthenticated()" th:onclick="|location.href='@{/board}'|">게시글 작성</button>
+    <main class="mt-5 pt-5">
+        <div class="container-fluid px-4">
+            <h1 class="mt-4">Board</h1>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                        <tr>
+                            <th>제목</th>
+                            <th>작성자</th>
+                            <th>작성일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="board : ${boardList}">
+                                <td><a th:href="@{/board/{boardId}(boardId = ${board.boardId})}" th:text="${board.title}">title</a></td>
+                                <td th:text="${board.writer}">writer</td>
+                                <td th:text="${board.wroteAt}">wroteAt</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 </body>
-
-<script th:inline="javascript">
-
-    $('header').load('header.html')
-
-</script>
 
 </html>

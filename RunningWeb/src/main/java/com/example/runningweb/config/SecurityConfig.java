@@ -25,7 +25,9 @@ public class SecurityConfig {
         //허용 접근 URL
         http.authorizeHttpRequests(
                 request ->{
-                    request.requestMatchers("/", "/main", "/signup", "/login", "/error", "/logout").permitAll();
+                    request.requestMatchers("/", "/main", "/signup",
+                            "/login", "/error", "/logout", "/css/**", "/board/**", "/image/**" ).permitAll();
+                    request.requestMatchers("/board").authenticated(); //작성은 인증해야 함.
                 }
         );
 

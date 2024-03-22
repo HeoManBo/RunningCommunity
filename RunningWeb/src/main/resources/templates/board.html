@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>게시글 작성 </title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f2f2f2;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+    }
+
+    input[type="file"] {
+      margin-bottom: 15px;
+    }
+
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      float: right;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <div th:replace="~{/fragment/header.html}" ></div>
+    <form th:action="@{/board}" th:object="${boardDto}" method="post" enctype="multipart/form-data">
+      <label for="title">제목:</label>
+      <input type="text" id="title" name="title" th:field="*{title}"  required>
+
+      <label for="content">내용:</label>
+      <textarea id="content" name="content" rows="5" th:field="*{content}" required></textarea>
+
+      <label for="file">파일 첨부:</label>
+      <input type="file" id="file" name="file" th:field="*{attachFile}">
+
+      <input type="submit" value="게시하기">
+    </form>
+</body>
+</html>

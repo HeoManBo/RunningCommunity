@@ -1,5 +1,6 @@
 package com.example.runningweb.security;
 
+import com.example.runningweb.domain.Member;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,8 +14,7 @@ import java.util.List;
 @Getter
 public class MemberUserDetails implements UserDetails {
 
-    private String username;
-    private String password;
+    private Member member;
     private List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
     @Override
@@ -24,12 +24,12 @@ public class MemberUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return password;
+        return member.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return username;
+        return member.getUsername();
     }
 
     @Override
@@ -52,9 +52,8 @@ public class MemberUserDetails implements UserDetails {
         return true;
     }
 
-    public MemberUserDetails(String username, String password) {
-        this.username = username;
-        this.password = password;
+    public MemberUserDetails(Member member) {
+        this.member = member;
         authorities.add(new SimpleGrantedAuthority("USER"));
     }
 }

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>
+    <div th:replace="~{/fragment/header.html}" ></div>
+    <link th:href="@{/css/bootstrap.min.css}"
+         href="../css/bootstrap.min.css" rel="stylesheet">
+  </title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+    .post {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .post-header {
+      background-color: #f5f5f5;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .post-body {
+      margin-bottom: 10px;
+    }
+    .comments {
+      margin-top: 20px;
+    }
+    .comment {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+    .comment-form {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+<h1>게시판</h1>
+<div class="post">
+  <div class="post-header">
+    <h2 th:text="${boardViewDto.title}">제목</h2>
+    <h2 th:text="${boardViewDto.writer}">작성자</h2>
+    <h2>첨부 파일 </h2>
+    <p th:each="file : ${boardViewDto.getAttachFiles()}">
+      <a th:if="${file.extractExt() == 'PNG' || file.extractExt() == 'JPG' || file.extractExt() == 'jpg' || file.extractExt() == 'png'}">
+        <img id="img" th:src="@{|/image/${file.serverFileName}|}" alt="no image">
+      </a>
+      <a href="#" th:text="${file.originalName}">file_name</a>
+    </p>
+  </div>
+  <div class="post-body">
+    <p th:text="${boardViewDto.content}">내용</p>
+  </div>
+  <div class="comments">
+    <h3>댓글</h3>
+    <div class="comment">
+      <p>댓글 내용</p>
+    </div>
+    <div class="comment">
+      <p>또 다른 댓글 내용</p>
+    </div>
+  </div>
+  <div class="comment-form">
+    <h3>댓글 작성</h3>
+    <textarea placeholder="댓글을 입력하세요"></textarea>
+    <button>댓글 등록</button>
+  </div>
+</div>
+</body>
+</html>

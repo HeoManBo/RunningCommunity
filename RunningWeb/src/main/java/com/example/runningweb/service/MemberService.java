@@ -18,22 +18,32 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     public Long save(MemberDto memberDto){
+        validateDuplicateMember(memberDto);
+
+        Member member = createMemberFromDto(memberDto);
+
+        Member savedMember = memberRepository.save(member);
+        return savedMember.getId();
+    }
+
+    private void validateDuplicateMember(MemberDto memberDto) {
         //중복 체크
         Member duplicatedCheck = memberRepository.findByUsername(memberDto.getId());
         if(duplicatedCheck != null){
             throw new IllegalArgumentException("중복되는 아이디 입니다.");
         }
+    }
 
+    private Member createMemberFromDto(MemberDto memberDto) {
         Member member = Member.builder()
                 .userName(memberDto.getId())
                 .nickname(memberDto.getNickname())
                 .email(memberDto.getEmail())
                 .password(passwordEncoder.encode(memberDto.getPassword()))
                 .build();
-
-        Member savedMember = memberRepository.save(member);
-        return savedMember.getId();
+        return member;
     }
+
 
 
 

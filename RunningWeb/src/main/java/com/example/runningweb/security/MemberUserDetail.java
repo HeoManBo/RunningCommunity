@@ -24,13 +24,13 @@ public class MemberUserDetail implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member user = memberRepository.findByUsername(username);
+        Member member = memberRepository.findByUsername(username);
 
-        if(user == null){
+        if(member == null){
             throw new UsernameNotFoundException("아이디 혹은 비밀번호가 일치하지 않습니다.");
         }
 
-        log.info("username = {}, password = {}", user.getUsername(), user.getPassword());
-        return new MemberUserDetails(user.getUsername(), user.getPassword());
+        log.info("username = {}, password = {}", member.getUsername(), member.getPassword());
+        return new MemberUserDetails(member);
     }
 }

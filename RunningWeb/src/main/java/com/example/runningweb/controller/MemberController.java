@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Slf4j
@@ -49,13 +50,13 @@ public class MemberController {
             return "signup";
         }
 
-        return "/login";
+        return "redirect:/login";
     }
 
     @GetMapping("/login")
     public String login(Model model){
         model.addAttribute("loginDto", new LoginDto());
-        return "/login";
+        return "login";
     }
 
 
