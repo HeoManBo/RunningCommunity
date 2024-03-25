@@ -3,6 +3,7 @@ package com.example.runningweb.controller;
 
 import com.example.runningweb.dto.BoardDto;
 import com.example.runningweb.dto.BoardViewDto;
+import com.example.runningweb.dto.CommentDto;
 import com.example.runningweb.security.MemberUserDetail;
 import com.example.runningweb.security.MemberUserDetails;
 import com.example.runningweb.service.BoardService;
@@ -43,7 +44,6 @@ public class BoardController {
                                 RedirectAttributes redirectAttributes,
                                 @AuthenticationPrincipal MemberUserDetails userDetails){
         if(userDetails == null){ //로그인 안되있는 사람 방지
-
             return "redirect:/login";
         }
 
@@ -61,10 +61,17 @@ public class BoardController {
     }
 
     @GetMapping("/board/{boardId}")
-    public String viewBoard(@PathVariable("boardId") Long boardId, Model model) {
+    public String viewBoard(@PathVariable("boardId") Long boardId, Model model,
+                            @AuthenticationPrincipal MemberUserDetails userDetails) {
+        if(userDetails == null){ //비 로그인 상태
+            model.addAttribute("loginId", -1);
+        }else{ //로그인 상태
+            model.addAttribute("loginId", userDetails.getMember().getId());
+        }
+
         BoardViewDto boardViewDto = boardService.findByBoardId(boardId);
         model.addAttribute("boardViewDto", boardViewDto);
-
+        model.addAttribute("commentDto", new CommentDto());
         return "board-view";
     }
 

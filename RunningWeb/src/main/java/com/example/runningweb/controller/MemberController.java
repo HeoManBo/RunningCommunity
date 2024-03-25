@@ -3,17 +3,17 @@ package com.example.runningweb.controller;
 import com.example.runningweb.dto.LoginDto;
 import com.example.runningweb.dto.MemberDto;
 import com.example.runningweb.service.MemberService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @Slf4j
@@ -54,8 +54,18 @@ public class MemberController {
     }
 
     @GetMapping("/login")
-    public String login(Model model){
+    public String login(Model model, HttpServletRequest request){
         model.addAttribute("loginDto", new LoginDto());
+
+        //이전 페이지에 대한 요청을 헤더에 저장해 놓음
+        String prevUrl =  (String)request.getHeader("Referer");
+        //만약 이전 페이지의 요청이 있고, 이전 페이지가 /login이 아니라면 이동
+        // referer 페이지로 이동, 만약 login 실패하고 성공하면 다시 /login으로 redirect 되기때문에 /login 인 경우는 제외함.
+        if(prevUrl != null && !prevUrl.contains("/login")){
+            request.getSession().setAttribute("prevUrl", prevUrl);
+        }
+
+
         return "login";
     }
 

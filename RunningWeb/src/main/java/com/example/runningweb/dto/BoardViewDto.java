@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class BoardViewDto {
 
+    private Long boardId;
     private String title;
     private String content;
     private List<AttachFile> attachFiles;
@@ -18,7 +19,8 @@ public class BoardViewDto {
     private String writeAt; //작성 시간
 
     @Builder
-    public BoardViewDto(String title, String content, List<AttachFile> attachFiles, String writer, String writeAt) {
+    public BoardViewDto(Long boardId, String title, String content, List<AttachFile> attachFiles, String writer, String writeAt) {
+        this.boardId = boardId;
         this.title = title;
         this.content = content;
         this.attachFiles = attachFiles;

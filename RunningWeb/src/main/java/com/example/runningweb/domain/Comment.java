@@ -42,6 +42,7 @@ public class Comment extends BaseEntity {
     private Board board;
 
 
+    @Builder
     public Comment(String content, Comment parent, List<Comment> child, Member member, Board board) {
         this.content = content;
         this.parent = parent;

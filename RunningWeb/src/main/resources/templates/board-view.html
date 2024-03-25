@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+
   <title>
     <div th:replace="~{/fragment/header.html}" ></div>
-    <link th:href="@{/css/bootstrap.min.css}"
-         href="../css/bootstrap.min.css" rel="stylesheet">
   </title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -27,14 +30,6 @@
     .post-body {
       margin-bottom: 10px;
     }
-    .comments {
-      margin-top: 20px;
-    }
-    .comment {
-      border: 1px solid #ccc;
-      padding: 10px;
-      margin-bottom: 10px;
-    }
     .comment-form {
       margin-top: 20px;
     }
@@ -42,14 +37,14 @@
 </head>
 <body>
 <h1>게시판</h1>
-<div class="post">
+<div class="post" >
   <div class="post-header">
     <h2 th:text="${boardViewDto.title}">제목</h2>
     <h2 th:text="${boardViewDto.writer}">작성자</h2>
     <h2>첨부 파일 </h2>
     <p th:each="file : ${boardViewDto.getAttachFiles()}">
       <a th:if="${file.extractExt() == 'PNG' || file.extractExt() == 'JPG' || file.extractExt() == 'jpg' || file.extractExt() == 'png'}">
-        <img id="img" th:src="@{|/image/${file.serverFileName}|}" alt="no image">
+        <img id="img" th:src="@{|/image/${file.serverFileName}|}" alt="no image" height="300" width="300">
       </a>
       <a href="#" th:text="${file.originalName}">file_name</a>
     </p>
@@ -57,20 +52,132 @@
   <div class="post-body">
     <p th:text="${boardViewDto.content}">내용</p>
   </div>
-  <div class="comments">
-    <h3>댓글</h3>
-    <div class="comment">
-      <p>댓글 내용</p>
-    </div>
-    <div class="comment">
-      <p>또 다른 댓글 내용</p>
-    </div>
-  </div>
   <div class="comment-form">
-    <h3>댓글 작성</h3>
-    <textarea placeholder="댓글을 입력하세요"></textarea>
-    <button>댓글 등록</button>
+    <form id="comment-form" th:action="@{/comment/{boardId}(boardId  = ${boardViewDto.boardId})}" th:object="${commentDto}" method="post" >
+      <div class="form-group">
+        <input sec:authorize="isAuthenticated()" id="comment_content" type="text" th:field="*{content}" placeholder="댓글을 입력하세요">
+        <input sec:authorize="isAuthenticated()" type="submit" value="댓글 작성">
+        <input sec:authorize="!isAuthenticated()" placeholder="로그인 한 사람만 댓글 작성이 가능합니다." readonly>
+      </div>
+    </form>
+  </div>
+  <div id="comment-list">
   </div>
 </div>
 </body>
+
+<script th:inline="javascript">
+
+  var boardId = [[${boardViewDto.boardId}]]
+  var userId = /*[[${loginId}]]*/ -1;
+  var csrf_token = $("meta[name='_csrf']").attr("content");
+  var csrf_header = $("meta[name='_csrf_header']").attr("content");
+
+  console.log(userId)
+
+  function loadComments() {
+    $.ajax({
+      url: `/comment/${boardId}`,
+      type: "get",
+      success: function (comments) {
+        let commentList = $(`#comment-list`)
+        commentList.empty(); // 기존 댓글 삭제
+        console.log(comments);
+        comments.forEach(function (comment) {
+          console.log(comment.writer_id);
+          var date = new Date(comment.wroteAt)
+          const formattedDate =  `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+          let commentHtml = `
+              <div class="comment" data-comment-id="${comment.comment_id}">
+                <p>${comment.writer}</p>
+                <p>${comment.content}</p>
+                <p>${formattedDate}</p>
+              </div>
+           `;
+
+          if (userId == comment.writer_id) {
+            let spanElement = document.createElement('span');
+
+            let deleteButton = document.createElement('button');
+            deleteButton.id = 'deleteBtn';
+            deleteButton.className = 'btn btn-danger';
+            deleteButton.textContent = '삭제';
+
+            let updateButton = document.createElement('button');
+            updateButton.id = 'updateBtn';
+            updateButton.className = 'btn btn-warning';
+            updateButton.textContent = '수정';
+
+            spanElement.appendChild(deleteButton);
+            spanElement.appendChild(updateButton);
+
+            commentHtml += spanElement.outerHTML;
+          }
+
+          commentList.append(commentHtml)
+        });
+      },
+      error: function () {
+        alert('댓글 로딩에 실패했습니다.')
+      }
+    })
+  };
+
+  console.log($('#comment-list'))
+
+  // 이벤트 위임 설정
+  $('#comment-list').on('click', '.delete-btn', function() {
+    const commentId = $(this).closest('.comment').data('comment-id');
+    deleteComment(commentId);
+  });
+
+  function deleteComment(commentId) {
+    $.ajax({
+      url: `/comment/${commentId}`,
+      type: "delete",
+      beforeSend: function(request) {
+        request.setRequestHeader(csrf_header, csrf_token);
+      },
+      success: function() {
+        alert('댓글 삭제에 성공했습니다.');
+        loadComments();
+      },
+      error: function() {
+        alert('댓글 삭제에 실패했습니다.');
+      }
+    });
+  }
+
+
+  $('#comment-form').submit(function(event){
+    event.preventDefault(); // 폼 제출 기본 동작 방지
+
+    let content = $('#comment_content').val(); // 보낼 댓글 내용
+    console.log(content);
+    console.log(JSON.stringify({content: content})) // JSON 화
+
+    $.ajax({
+      url: `/comment/${boardId}`,
+      type: 'POST',
+      beforeSend: function(request){
+        request.setRequestHeader(csrf_header, csrf_token)
+      },
+      data: JSON.stringify({content: content}),
+      contentType: 'application/json',
+      success: function(){
+        loadComments(); //댓글 재갱신
+        $('#comment_content').val('');
+      },
+      error: function(){
+        alert("code:"+ request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+      }
+    })
+  })
+
+  window.addEventListener('DOMContentLoaded', function (){
+    loadComments(); // 페이지 로드 시 댓글 불러오기
+  });
+
+</script>
+
 </html>

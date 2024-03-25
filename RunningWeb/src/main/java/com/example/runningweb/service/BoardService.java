@@ -63,6 +63,7 @@ public class BoardService {
         List<AttachFile> attachFiles = fileRepository.getAttachFiles(board);
 
         return BoardViewDto.builder()
+                .boardId(boardId)
                 .title(board.getTitle())
                 .content(board.getContent())
                 .attachFiles(attachFiles)
@@ -73,6 +74,7 @@ public class BoardService {
     //추후 페이징 처리 필요함.
     public List<BoardListDto> boardList() {
         List<Board> all = boardRepository.findAll();
+        all.sort((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()));
 
         return all.stream().map(board -> BoardListDto.builder()
                         .boardId(board.getId())
