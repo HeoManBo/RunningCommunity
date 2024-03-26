@@ -61,6 +61,7 @@ public class CommentService {
         }
 
         //댓글 삭제 처리
+        // findBy 이후에 Delete 로 select 쿼리가 한 번더 나감
         commentRepository.deleteById(commentId);
     }
 }
