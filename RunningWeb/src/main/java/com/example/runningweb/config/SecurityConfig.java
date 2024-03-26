@@ -30,6 +30,7 @@ public class SecurityConfig {
                     request.requestMatchers("/", "/main", "/signup",
                             "/login", "/error", "/logout", "/css/**", "/board/**", "/image/**", "/comment/**" ).permitAll();
                     request.requestMatchers("/board").authenticated(); //작성은 인증해야 함.
+                    request.requestMatchers("/member/**").authenticated(); //멤버 수정작업은 인증이 필요함
                 }
         );
 
@@ -53,7 +54,7 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer(){
-        return (web) -> web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+        return (web) -> web.ignoring().requestMatchers("/resources/**", "/static/**", "/webjars/**");
     }
 
 

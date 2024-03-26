@@ -3,6 +3,8 @@ package com.example.runningweb.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -32,5 +34,22 @@ public class Member extends BaseEntity {
         this.password = password;
         this.nickname = nickname;
         this.email = email;
+    }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void updateEmail(String email) {
+        this.email = email;
+    }
+
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
+    @Override
+    public void withdraw() {
+        super.withdraw();
     }
 }

@@ -23,4 +23,8 @@ public class BaseEntity {
 
     private int isDeleted;
 
+    protected void withdraw(){
+        isDeleted = 1;
+    }
+
 }

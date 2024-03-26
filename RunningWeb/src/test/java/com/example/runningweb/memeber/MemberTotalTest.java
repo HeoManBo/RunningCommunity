@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @Transactional
 @AutoConfigureMockMvc
-public class 멤버_통합_테스트 {
+public class MemberTotalTest {
 
 
     @Autowired

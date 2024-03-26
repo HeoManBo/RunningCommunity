@@ -2,17 +2,21 @@ package com.example.runningweb.security;
 
 import com.example.runningweb.domain.Member;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 
 @Getter
+@Setter
 public class MemberUserDetails implements UserDetails {
+    private static final long serialVersionUID = 1L;
 
     private Member member;
     private List<SimpleGrantedAuthority> authorities = new ArrayList<>();

@@ -2,7 +2,6 @@ package com.example.runningweb.controller;
 
 import com.example.runningweb.dto.CommentDto;
 import com.example.runningweb.security.MemberUserDetails;
-import com.example.runningweb.service.BoardService;
 import com.example.runningweb.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
