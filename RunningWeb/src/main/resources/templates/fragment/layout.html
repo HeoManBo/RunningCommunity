@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8">
+  <title>Layout</title>
+  <!-- CSS, JS 등 공통 리소스 -->
+</head>
+<body>
+<!-- 헤더 -->
+<header th:replace="fragments/header :: header"></header>
+
+<!-- 본문 영역 (콘텐츠가 삽입될 자리) -->
+<div layout:fragment="content"></div>
+
+<!-- 푸터 -->
+<footer th:replace="fragments/footer :: footer"></footer>
+</body>
+</html>

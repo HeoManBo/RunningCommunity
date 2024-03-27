@@ -1,49 +1,32 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>사이트 제목</title>
-  <style>
-    /* CSS 스타일링 */
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px;
-      background-color: #f0f0f0;
-    }
-
-    .left-button, .right-buttons {
-      display: flex;
-      align-items: center;
-    }
-
-    .right-buttons button {
-      margin-left: 10px;
-    }
-  </style>
-</head>
-<body>
-<header>
-  <div class="left-button">
-    <!-- 메인페이지로 리다이렉트하는 버튼 -->
-    <button th:onclick="|location.href='@{/main}'|">메인페이지</button>
-  </div>
-  <div class="right-buttons">
-    <!-- 회원가입 버튼 로그인하지 않은 사람만 보이게 -->
-    <button sec:authorize="!isAuthenticated()" th:onclick="|location.href='@{/signup}'|">회원가입</button>
-    <button sec:authorize="!isAuthenticated()" th:onclick="|location.href='@{/login}'|">로그인</button>
-
-    <!-- 로그인 한 경우 -->
-    <div sec:authorize="isAuthenticated()" style="display:flex">
-      <button type="button" th:onclick="|location.href='@{/member/modify/{memberId}(memberId = ${#authentication.principal.member.id})}'|"
-              th:text="|${#authentication.principal.member.nickname}|" ></button>
-      <button type="button" th:onclick="|location.href='@{/logout}'|">로그아웃</button>
+<th:block th:fragment="headerFragment">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" th:href="@{/main}">Running Community</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          <!-- 추가 메뉴 항목 -->
+        </ul>
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" th:href="@{/signup}">회원가입</a>
+          </li>
+          <li class="nav-item" sec:authorize="!isAuthenticated()">
+            <a class="nav-link" th:href="@{/login}">로그인</a>
+          </li>
+          <li class="nav-item" sec:authorize="isAuthenticated()">
+            <a class="nav-link" th:href="@{/member/modify/{memberId}(memberId=${#authentication.principal.member.id})}" th:text="${#authentication.principal.member.nickname}"></a>
+          </li>
+          <li class="nav-item" sec:authorize="isAuthenticated()">
+            <a class="nav-link" th:href="@{/logout}">로그아웃</a>
+          </li>
+        </ul>
+      </div>
     </div>
-
-  </div>
-</header>
-</body>
+  </nav>
+</th:block>
 </html>

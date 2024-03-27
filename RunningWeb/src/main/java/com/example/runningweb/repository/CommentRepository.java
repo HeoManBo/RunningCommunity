@@ -5,6 +5,7 @@ import com.example.runningweb.domain.Board;
 import com.example.runningweb.domain.Comment;
 import com.example.runningweb.dto.CommentDto;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -25,4 +26,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     Optional<Comment> getDeletedComment(@Param("comment_id") Long comment_id);
 
 
+    @Modifying
+    void deleteByBoard(Board board);
 }

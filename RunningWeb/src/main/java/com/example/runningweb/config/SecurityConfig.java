@@ -31,6 +31,7 @@ public class SecurityConfig {
                             "/login", "/error", "/logout", "/css/**", "/board/**", "/image/**", "/comment/**" ).permitAll();
                     request.requestMatchers("/board").authenticated(); //작성은 인증해야 함.
                     request.requestMatchers("/member/**").authenticated(); //멤버 수정작업은 인증이 필요함
+                    request.requestMatchers("/file/**").authenticated(); //파일 삭제는 로그인한사람만 가능
                 }
         );
 

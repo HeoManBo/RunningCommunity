@@ -1,76 +1,44 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>게시글 작성 </title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-    }
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 
-    h1 {
-      text-align: center;
-      color: #333;
-    }
-
-    form {
-      max-width: 500px;
-      margin: 0 auto;
-      background-color: #fff;
-      padding: 20px;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-    }
-
-    input[type="text"],
-    textarea {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-      margin-bottom: 15px;
-    }
-
-    input[type="file"] {
-      margin-bottom: 15px;
-    }
-
-    input[type="submit"] {
-      background-color: #4CAF50;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      float: right;
-    }
-
-    input[type="submit"]:hover {
-      background-color: #45a049;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>게시글 작성</title>
+  <header th:replace="~{/fragment/header.html}"> </header>
 </head>
 <body>
-  <div th:replace="~{/fragment/header.html}" ></div>
-    <form th:action="@{/board}" th:object="${boardDto}" method="post" enctype="multipart/form-data">
-      <label for="title">제목:</label>
-      <input type="text" id="title" name="title" th:field="*{title}"  required>
-
-      <label for="content">내용:</label>
-      <textarea id="content" name="content" rows="5" th:field="*{content}" required></textarea>
-
-      <label for="file">파일 첨부:</label>
-      <input type="file" id="file" name="file" th:field="*{attachFile}">
-
-      <input type="submit" value="게시하기">
-    </form>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">새 글 작성</h4>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/board}" th:object="${boardDto}" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+              <label for="title">제목</label>
+              <input type="text" class="form-control" id="title" name="title" th:field="*{title}" required>
+            </div>
+            <div class="form-group">
+              <label for="content">내용</label>
+              <textarea class="form-control" id="content" name="content" rows="5" th:field="*{content}" required></textarea>
+            </div>
+            <div class="form-group">
+              <label for="file">파일 첨부</label>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="file" name="file" th:field="*{attachFile}" multiple>
+                <label class="custom-file-label" for="file">파일을 선택하세요</label>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">게시하기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>

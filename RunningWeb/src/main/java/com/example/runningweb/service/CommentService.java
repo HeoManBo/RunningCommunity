@@ -64,4 +64,9 @@ public class CommentService {
         // findBy 이후에 Delete 로 select 쿼리가 한 번더 나감
         commentRepository.deleteById(commentId);
     }
+
+    // boardId 에 해당하는 모든 게시글을 삭제함.
+    public void deleteComments(Board board) {
+        commentRepository.deleteByBoard(board);
+    }
 }

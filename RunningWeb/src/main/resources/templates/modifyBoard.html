@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
+  <meta id="_csrf_header" name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+</head>
+<body>
+<header th:replace="~{/fragment/header.html}" ></header>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">게시굴 수정</h4>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/board/modify/{boardId}(boardId = ${boardUpdateRequest.getBoardViewDto().boardId})}" th:object="${boardUpdateRequest}" method="post" enctype="multipart/form-data">
+            <input type="hidden" th:field="*{boardViewDto.username}">
+            <input type="hidden" th:field="*{boardViewDto.boardId}">
+            <div class="form-group">
+              <label for="title">제목</label>
+              <input type="text" class="form-control" id="title" name="title" th:field="*{boardViewDto.title}" required>
+            </div>
+            <div class="form-group">
+              <label for="content">내용</label>
+              <textarea class="form-control" id="content" name="content" rows="5" th:field="*{boardViewDto.content}" required></textarea>
+            </div>
+            <div class="form-group">
+              <div class="form-group">
+                <label for="file">기존 첨부 파일</label>
+                <div id="existingFiles">
+                  <div th:each="file : *{boardViewDto.getAttachFiles()}">
+                    <div class="d-flex align-items-center mb-2">
+                      <span th:text="${file.originalName}"></span>
+                      <button type="button" class="btn btn-sm btn-danger ml-2" th:data-filename="${file.serverFileName}" onclick="deleteFile(this)">삭제</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <label for="file">파일 첨부</label>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input" id="file" name="file"  th:field="*{newAttachFiles}" multiple>
+                <label class="custom-file-label" for="file">파일을 선택하세요</label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">게시하기</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+
+<script th:inline="javascript">
+
+  var csrf_token = $("meta[name='_csrf']").attr("content");
+  var csrf_header = $("meta[name='_csrf_header']").attr("content");
+
+  function deleteFile(button) {
+    const fileName = button.getAttribute('data-filename');
+
+    $.ajax({
+      url: `/file/${fileName}`,
+      type: 'DELETE',
+      beforeSend: function(request) {
+        request.setRequestHeader(csrf_header, csrf_token);
+      },
+      success: function() {
+        $(button).closest('.d-flex').remove();
+        alert('파일이 삭제되었습니다.');
+      },
+      error: function() {
+        alert('파일 삭제에 실패했습니다.');
+      }
+    });
+  }
+</script>
+</html>
