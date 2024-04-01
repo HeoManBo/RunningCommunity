@@ -11,6 +11,11 @@ import com.example.runningweb.repository.BoardRepository;
 import com.example.runningweb.repository.FileRepository;
 import com.example.runningweb.util.FileUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,7 +30,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BoardService {
+
+    private static final int PAGE_SIZE = 10; //한 페이지당 10 페이지를 보여줌
 
     private final BoardRepository boardRepository;
     private final FileRepository fileRepository;
@@ -55,15 +63,22 @@ public class BoardService {
         return board.getId();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public BoardViewDto findByBoardId(Long boardId) {
         List<Board> boards = boardRepository.getBoardWithUser(boardId); // pk로 조회하므로 1개밖에 없어야 함
+
         if(boards.size() != 1){
+            log.info("board Size : {}", boards.size());
             throw new IllegalArgumentException("잘못된 게시판 번호입니다.");
         }
+
         Board board = boards.get(0);
 
         List<AttachFile> attachFiles = fileRepository.getAttachFiles(board);
+
+        // view 업데이트
+        //board.addView();
+        boardRepository.updateViewCount(boardId);
 
         return BoardViewDto.builder()
                 .boardId(boardId)
@@ -76,17 +91,26 @@ public class BoardService {
     }
 
     //추후 페이징 처리 필요함.
-    public List<BoardListDto> boardList() {
-        List<Board> all = boardRepository.findAll();
-        all.sort((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()));
+    public List<BoardListDto> boardList(Integer pageNum) {
+        Pageable paging = PageRequest
+                .of(pageNum - 1, PAGE_SIZE, Sort.by("createdAt").descending());
+
+        Page<Board> pagingBoards = boardRepository.findByPagingBoard(paging);
+        if(pagingBoards.getTotalPages() < pageNum-1) {
+            throw new IllegalArgumentException("너무 큰 페이지 번호입니다.");
+        }
+
+        List<Board> all = pagingBoards.getContent();
+        all.get(0).getComments(); // in Query로 처리
 
         return all.stream().map(board -> BoardListDto.builder()
                         .boardId(board.getId())
                     .title(board.getTitle())
                     .writer(board.getWriter())
                     .wroteAt(formattingDate(board.getCreatedAt()))
+                    .commentCnt(board.getComments().size())
                     .build())
-                .collect(Collectors.toList());
+                    .collect(Collectors.toList());
     }
 
     private String formattingDate(LocalDateTime localDateTime){

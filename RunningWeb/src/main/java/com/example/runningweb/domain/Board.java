@@ -38,7 +38,10 @@ public class Board extends BaseEntity{
     private List<AttachFile> files = new ArrayList<>();
 
     private String writer; //작성자
+    private int view; //조회수
 
+    @OneToMany(mappedBy = "board", fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Board(String content, String title, Member member, String writer) {
@@ -48,6 +51,7 @@ public class Board extends BaseEntity{
         this.up = 0;
         this.down = 0;
         this.writer = writer;
+        this.view = 0;
     }
 
     //== 연관관계 메소드 ==//
@@ -70,5 +74,9 @@ public class Board extends BaseEntity{
     public void updateBoard(BoardViewDto boardViewDto) {
         this.title = boardViewDto.getTitle();
         this.content = boardViewDto.getContent();
+    }
+
+    public void addView(){
+        this.view += 1;
     }
 }

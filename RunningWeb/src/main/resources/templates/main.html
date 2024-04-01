@@ -23,6 +23,7 @@
                             <th>제목</th>
                             <th>작성자</th>
                             <th>작성일</th>
+                            <th>댓글수</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -30,6 +31,7 @@
                                 <td><a th:href="@{/board/{boardId}(boardId = ${board.boardId})}" th:text="${board.title}">title</a></td>
                                 <td th:text="${board.writer}">writer</td>
                                 <td th:text="${board.wroteAt}">wroteAt</td>
+                                <td th:text="${board.commentCnt}">commentCnt</td>
                         </tr>
                         </tbody>
                     </table>

@@ -15,12 +15,15 @@ public class BoardListDto {
     private String title;
     private String writer;
     private String wroteAt;
+    private int commentCnt; // 댓글 수
 
     @Builder
-    public BoardListDto(Long boardId, String title, String writer, String wroteAt) {
+
+    public BoardListDto(Long boardId, String title, String writer, String wroteAt, int commentCnt) {
         this.boardId = boardId;
         this.title = title;
         this.writer = writer;
         this.wroteAt = wroteAt;
+        this.commentCnt = commentCnt;
     }
 }
