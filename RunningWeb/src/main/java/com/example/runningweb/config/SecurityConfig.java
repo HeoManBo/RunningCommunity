@@ -28,10 +28,12 @@ public class SecurityConfig {
         http.authorizeHttpRequests(
                 request ->{
                     request.requestMatchers("/", "/main", "/signup",
-                            "/login", "/error", "/logout", "/css/**", "/board/**", "/image/**", "/comment/**" ).permitAll();
+                            "/login", "/error", "/logout", "/css/**", "/board/**", "/image/**", "/comment/**",
+                            "/resources/**", "/static/**", "/webjars/**", "/error**").permitAll();
                     request.requestMatchers("/board").authenticated(); //작성은 인증해야 함.
                     request.requestMatchers("/member/**").authenticated(); //멤버 수정작업은 인증이 필요함
                     request.requestMatchers("/file/**").authenticated(); //파일 삭제는 로그인한사람만 가능
+                    request.requestMatchers("/insertDummyBoard").authenticated();
                 }
         );
 
@@ -53,10 +55,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer(){
-        return (web) -> web.ignoring().requestMatchers("/resources/**", "/static/**", "/webjars/**");
-    }
 
 
     @Bean

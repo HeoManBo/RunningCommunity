@@ -22,13 +22,21 @@ public class BasicController {
     }
     @GetMapping("/main")
     public String main(Model model,
-                       @RequestParam(required = false, defaultValue = "1", name = "page") Integer pageNum){
-        if(pageNum < 0){
+                       @RequestParam(required = false, defaultValue = "1", name = "page")
+                       Integer page){
+        if(page < 0){
             throw new IllegalArgumentException("잘못된 게시판 페이지 조회입니다.");
         }
-        List<BoardListDto> boardListDtos = boardService.boardList(pageNum);
+
+        List<BoardListDto> boardListDtos = boardService.boardList(page);
         model.addAttribute("boardList", boardListDtos);
         return "main";
     }
+
+/*    @GetMapping("/insertDummyBoard")
+    public String dummyBoard(){
+        boardService.makeDummyBoard();
+        return "redirect:/main";
+    }*/
 
 }

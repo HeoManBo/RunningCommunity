@@ -9,6 +9,7 @@ import com.example.runningweb.dto.BoardUpdateRequest;
 import com.example.runningweb.dto.BoardViewDto;
 import com.example.runningweb.repository.BoardRepository;
 import com.example.runningweb.repository.FileRepository;
+import com.example.runningweb.repository.MemberRepository;
 import com.example.runningweb.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,7 @@ public class BoardService {
     private final FileRepository fileRepository;
     private final CommentService commentService;
     private final FileUtil fileUtil;
-
+    private final MemberRepository memberRepository;
 
     /**
      * 파일을 만들려다가 실패하는 경우 이전파일을 삭제 해야함
@@ -59,7 +60,7 @@ public class BoardService {
         saveFiles(boardDto.getAttachFile(), board);
 
         boardRepository.save(board);
-        board.UpdateWriter(member);
+        board.updateWriter(member);
         return board.getId();
     }
 
@@ -100,17 +101,24 @@ public class BoardService {
             throw new IllegalArgumentException("너무 큰 페이지 번호입니다.");
         }
 
+        int endPage = (int)(Math.ceil(pageNum / 10.0)) * 10;
+        endPage = Math.min(endPage, pagingBoards.getTotalPages()); //마지막 페이지 번호
+        int startPage = endPage - 9 <= 0 ? 1 : endPage - 9;
         List<Board> all = pagingBoards.getContent();
         all.get(0).getComments(); // in Query로 처리
 
+        int finalEndPage = endPage;
         return all.stream().map(board -> BoardListDto.builder()
                         .boardId(board.getId())
-                    .title(board.getTitle())
-                    .writer(board.getWriter())
-                    .wroteAt(formattingDate(board.getCreatedAt()))
-                    .commentCnt(board.getComments().size())
-                    .build())
-                    .collect(Collectors.toList());
+                        .title(board.getTitle())
+                        .writer(board.getWriter())
+                        .wroteAt(formattingDate(board.getCreatedAt()))
+                        .commentCnt(board.getComments().size())
+                        .startPage(startPage)
+                        .endPage(finalEndPage)
+                        .lastPageNum(pagingBoards.getTotalPages())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private String formattingDate(LocalDateTime localDateTime){
@@ -172,4 +180,19 @@ public class BoardService {
 
     }
 
+    public void makeDummyBoard() {
+        Member member = memberRepository.findById(1L).get();
+        List<Board> dummies = new ArrayList<>();
+        for(int i=1; i<=100; i++){
+            Board board = Board.builder()
+                    .title(String.valueOf(i))
+                    .content(String.valueOf(i))
+                    .writer(member.getNickname())
+                    .build();
+
+            board.updateWriter(member);
+            dummies.add(board);
+        }
+        boardRepository.saveAll(dummies);
+    }
 }

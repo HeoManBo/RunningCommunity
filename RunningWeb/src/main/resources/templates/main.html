@@ -36,6 +36,20 @@
                         </tbody>
                     </table>
                 </div>
+                <ul class="pagination justify-content-center" th:with="start=${boardList[0].startPage}, end=${boardList[0].endPage},
+                 last=${boardList[0].lastPageNum}, now=${param.page}">
+                    <li class="page-item" th:classappend="(${start} == 1) ? 'disabled' : 'active'">
+                        <a class="page-link" th:href="@{/main(page=(${start}-1))}">이전</a>
+                    </li>
+                    <th:block th:each="page : ${#numbers.sequence(start, end)}">
+                        <li class="page-item" th:classappend="(page == ${now}) ? 'active' : ''">
+                            <a class="page-link" th:value="page" th:href="@{/main(page=${page})}">[[${page}]]</a>
+                        </li>
+                    </th:block>
+                    <li class="page-item" th:classappend="(${end} == ${last}) ? 'disabled' : 'active'">
+                        <a class="page-link" th:href="@{/main(page=(${end}+1))}">다음</a>
+                    </li>
+                </ul>
             </div>
         </div>
     </main>

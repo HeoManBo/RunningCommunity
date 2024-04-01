@@ -65,7 +65,7 @@ public class Board extends BaseEntity{
 
 
 
-    public void UpdateWriter(Member member) {
+    public void updateWriter(Member member) {
         //해당 게시글 작성자 설정 -> 이때 member는 게시판 업데이트를 하지 않음 -> 로그인시 게시판 정보를 가져오지 않았기 때문임.
         this.member = member;
     }

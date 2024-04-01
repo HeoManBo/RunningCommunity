@@ -27,4 +27,5 @@ public class BaseEntity {
         isDeleted = 1;
     }
 
+
 }
