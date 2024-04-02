@@ -28,7 +28,7 @@
                         </thead>
                         <tbody>
                         <tr th:each="board : ${boardList}">
-                                <td><a th:href="@{/board/{boardId}(boardId = ${board.boardId})}" th:text="${board.title}">title</a></td>
+                                <td><a th:href="@{/board/{boardId}(boardId = ${board.boardId}, returnPage = ${param.page})}" th:text="${board.title}">title</a></td>
                                 <td th:text="${board.writer}">writer</td>
                                 <td th:text="${board.wroteAt}">wroteAt</td>
                                 <td th:text="${board.commentCnt}">commentCnt</td>
