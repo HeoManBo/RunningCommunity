@@ -42,7 +42,7 @@
                         <a class="page-link" th:href="@{/main(page=(${start}-1))}">이전</a>
                     </li>
                     <th:block th:each="page : ${#numbers.sequence(start, end)}">
-                        <li class="page-item" th:classappend="(page == ${now}) ? 'active' : ''">
+                        <li class="page-item " th:classappend="${#strings.equals(now, page)} ? 'active' : ''">
                             <a class="page-link" th:value="page" th:href="@{/main(page=${page})}">[[${page}]]</a>
                         </li>
                     </th:block>
