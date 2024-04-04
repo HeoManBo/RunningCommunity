@@ -35,6 +35,22 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly("org.springframework.boot:spring-boot-devtools")
+
+    //websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    // Redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+//    compile group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2' gradle 9 부터 안됨,
+    //embedded-redis
+    implementation (group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2')
+
+    implementation 'org.webjars.bower:bootstrap:4.3.1'
+    implementation 'org.webjars.bower:vue:2.5.16' // vue
+    implementation 'org.webjars.bower:axios:0.17.1' // axios
+    implementation 'org.webjars:sockjs-client:1.1.2' // socket js
+    implementation 'org.webjars:stomp-websocket:2.3.3-1'
+    implementation 'com.google.code.gson:gson:2.8.0'
+
 }
 
 tasks.named('test') {

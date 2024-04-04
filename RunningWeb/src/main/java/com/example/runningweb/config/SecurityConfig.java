@@ -11,6 +11,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -21,22 +22,38 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class SecurityConfig {
 
+//    private static final String[] permitAllList = {
+//            "/webjars/**", "/favicon.ico", "/chat/**", "/pub/**","/sub/**",  "/ws-stomp",
+//            "/main", "/signup", "/login", "/error**", "/logout", "/css/**",
+//            "/board/**", "/image/**", "/comment/**", "/resources**", "/static**",
+//            "/", "/chat/**", "/ws-stomp/**"
+//    };
+
+    private static final String[] permitAllList = {
+            "/webjars/**", "/favicon.ico", "/main", "/signup", "/login", "/error**", "/logout", "/css/**",
+            "/board/**", "/image/**", "/comment/**", "/resources**", "/static**", "/",
+    };
+
+    private static final String[] authenticationList = {
+            "/board", "/member/**", "/file/**", "/insertDummyBoard",
+            "/chat/**", "/pub/**","/sub/**",  "/ws-stomp", "/ws-stomp/**"
+    };
+
     @Bean
-    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
-                                                   MemberRepository memberRepository) throws Exception {
-        //허용 접근 URL
-        http.authorizeHttpRequests(
-                request ->{
-                    request.requestMatchers("/", "/main", "/signup",
-                            "/login", "/error", "/logout", "/css/**", "/board/**", "/image/**", "/comment/**",
-                            "/resources/**", "/static/**", "/webjars/**", "/error**").permitAll();
-                    request.requestMatchers("/board").authenticated(); //작성은 인증해야 함.
-                    request.requestMatchers("/member/**").authenticated(); //멤버 수정작업은 인증이 필요함
-                    request.requestMatchers("/file/**").authenticated(); //파일 삭제는 로그인한사람만 가능
-                    request.requestMatchers("/insertDummyBoard").authenticated();
-                }
+    SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+
+
+        // SockJS는 기본적으로 HTML iframe 요소를 통한 전송을 허용하지 않도록 설정되는데 해당 내용을 해제한다.
+        http.headers(
+                headerConfig -> headerConfig.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
         );
 
+        http.authorizeHttpRequests(
+                request ->{
+                    request.requestMatchers(permitAllList).permitAll()
+                        .requestMatchers(authenticationList).authenticated();
+                }
+        );
 
         http.formLogin(config -> {
             config.defaultSuccessUrl("/main"); //성공시 rediect 페이지
@@ -50,7 +67,6 @@ public class SecurityConfig {
                     config.invalidateHttpSession(true); // 캐시 삭제
                 }
         );
-
 
         return http.build();
     }
