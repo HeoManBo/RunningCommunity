@@ -1,8 +1,10 @@
 package com.example.runningweb.chatting.config;
 
+import com.example.runningweb.chatting.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
 
@@ -11,6 +13,8 @@ import org.springframework.web.socket.config.annotation.*;
 @Configuration
 @RequiredArgsConstructor
 public class ChattingConfig implements WebSocketMessageBrokerConfigurer {
+
+    private final StompHandler stompHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -23,5 +27,10 @@ public class ChattingConfig implements WebSocketMessageBrokerConfigurer {
         // 채팅서버 stomp websocket 연결 endpoint (접속 주소)
         registry.addEndpoint("/ws-stomp")
                 .setAllowedOriginPatterns("*").withSockJS();
+    }
+
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompHandler);
     }
 }

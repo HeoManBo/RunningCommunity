@@ -3,7 +3,9 @@ package com.example.runningweb.chatting;
 
 import com.example.runningweb.chatting.Repository.ChatRoomRepository;
 import com.example.runningweb.chatting.domain.ChattingRoom;
+import com.example.runningweb.security.MemberUserDetails;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -31,7 +33,10 @@ public class ChatRoomController {
     @GetMapping("/rooms")
     @ResponseBody
     public List<ChattingRoom> allRoom() {
-        return chatRoomRepository.findAllRoom();
+        List<ChattingRoom> chatRooms = chatRoomRepository.findAllRoom();
+        chatRooms.forEach(chattingRoom -> chattingRoom.
+                setUserCount(chatRoomRepository.getUserCount(chattingRoom.getRoomId())));
+        return chatRooms;
     }
 
     //채팅방 생성
@@ -55,5 +60,13 @@ public class ChatRoomController {
         return chatRoomRepository.findById(roomId);
     }
 
+
+
+    // chatting 방에 접속한 유저의 정보를 반환함.
+    @GetMapping("/user")
+    @ResponseBody
+    public String getUserName(@AuthenticationPrincipal MemberUserDetails userDetails){
+        return userDetails.getMember().getNickname();
+    }
 
 }

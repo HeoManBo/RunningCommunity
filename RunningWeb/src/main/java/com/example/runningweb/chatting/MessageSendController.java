@@ -3,21 +3,24 @@ package com.example.runningweb.chatting;
 
 import com.example.runningweb.chatting.Repository.ChatRoomRepository;
 import com.example.runningweb.chatting.domain.ChattingMessage;
-import com.example.runningweb.chatting.domain.MessageType;
-import com.example.runningweb.config.redis.RedisPublisherService;
+import com.example.runningweb.chatting.service.ChatService;
+import com.example.runningweb.security.MemberUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @RequiredArgsConstructor
 @Controller
 @Slf4j
 public class MessageSendController {
 
-    private final RedisPublisherService publisher;
-    private final ChatRoomRepository chatRoomRepository;
+//    private final RedisPublisherService publisher;
+//    private final ChatRoomRepository chatRoomRepository;
 
     // /pub/chat/message 로 발행된 문자를 처리하여 구독자에게 전송한다.
     // 구독자는 웹단에서 /sub/chat/room/{roomId}를 구독하면 된다.
@@ -32,13 +35,36 @@ public class MessageSendController {
 //        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
 //    }
 
+
+    private final ChatService chatService;
+    private final ChatRoomRepository chatRoomRepository;
+
+    /**
+     * /pub/chat/message 로 들어온 메세지를 처리
+     */
     @MessageMapping("/chat/message")
-    public void message(ChattingMessage message) {
-        if (message.getType().equals(MessageType.ENTER)) {
-            chatRoomRepository.enterChatRoom(message.getRoomId());
-            message.setMessage(message.getSender() + "님이 입장하셨습니다.");
-        }
-        // Websocket 으로 전송된 메세지가 redis 로 발행된다
-        publisher.publish(chatRoomRepository.getTopic(message.getRoomId()), message);
+    public void message(ChattingMessage message, Principal principal) {
+        String username = getUsername(principal);
+
+        message.setSender(username);
+        message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
+
+        // redis로 발행
+        chatService.sendChatMessage(message);
     }
+
+
+    private String getUsername(Principal principal) {
+        String username = null;
+        if(principal instanceof UsernamePasswordAuthenticationToken token){
+            if(token.getPrincipal() instanceof UserDetails userDetails){
+                username = ((MemberUserDetails) userDetails).getMember().getNickname();
+            }
+        }
+        if(username == null){
+            username = "Unknown User";
+        }
+        return username;
+    }
+
 }

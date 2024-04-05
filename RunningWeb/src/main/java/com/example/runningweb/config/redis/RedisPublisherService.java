@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
  * sub : 메세지 수신
  */
 
-@Service
+//@Service
 @RequiredArgsConstructor
 public class RedisPublisherService {
 
