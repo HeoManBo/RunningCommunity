@@ -1,26 +1,25 @@
 package com.example.runningweb.chatting.Repository;
 
-import com.example.runningweb.chatting.domain.ChattingRoom;
-import com.example.runningweb.config.redis.RedisSubscriberService;
-import jakarta.annotation.PostConstruct;
+import com.example.runningweb.chatting.domain.RedisChattingRoom;
+import com.example.runningweb.domain.ChattingRoom;
+import com.example.runningweb.domain.Member;
+import com.example.runningweb.repository.ChattingRoomRepository;
+import com.example.runningweb.service.ChattingRoomService;
+import com.example.runningweb.service.EnteredRoomService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.channels.Channel;
 import java.util.*;
 
 
-@Component
+@Repository
 @RequiredArgsConstructor
-public class ChatRoomRepository {
+public class RedisChatRoomRepository {
 
     //redis
     private static final String CHAT_ROOMS = "CHAT_ROOM";
@@ -28,35 +27,38 @@ public class ChatRoomRepository {
     private static final String ENTER_INFO = "ENTER_INFO";
 
     @Resource(name = "redisTemplate")
-    private HashOperations<String, String, ChattingRoom> opsHashChatRoom; // (CHAT_ROOMS), (roomId(UUID), chatRoom) 형태로 저장
+    private HashOperations<String, String, RedisChattingRoom> opsHashChatRoom; // (CHAT_ROOMS), (roomId(UUID), chatRoom) 형태로 저장
     @Resource(name = "redisTemplate")
     private HashOperations<String, String, String> hashOpsEnterInfo; // (chat_Room), (roomId, USERINFO)
     @Resource(name = "redisTemplate")
     private ValueOperations<String, String> valueOps;
 
-
-//    @PostConstruct
-//    public void init() {
-//        opsHashChatRoom = template.opsForHash();
-//        hashOpsEnterInfo = template.opsForHash();
-//
-//    }
+    private final ChattingRoomService roomService;
+    private final EnteredRoomService enteredRoomService;
 
     //모든 채팅방 조회
-    public List<ChattingRoom> findAllRoom() {
+    public List<RedisChattingRoom> findAllRoom() {
         return opsHashChatRoom.values(CHAT_ROOMS);
     }
 
     // 특정 채팅방 조회
-    public ChattingRoom findById(String id) {
+    public RedisChattingRoom findById(String id) {
         return opsHashChatRoom.get(CHAT_ROOMS, id);
     }
 
     // 채팅방 생성 : 서버간 공유를 위해 Redis에 저장한다.
-    public ChattingRoom createChattingRoom(String name) {
-        ChattingRoom chattingRoom = new ChattingRoom(name);
-        opsHashChatRoom.put(CHAT_ROOMS, chattingRoom.getRoomId(), chattingRoom);
-        return chattingRoom;
+    @Transactional
+    public RedisChattingRoom createChattingRoom(String name, Member member) {
+        RedisChattingRoom redisChattingRoom = new RedisChattingRoom(name);
+
+        opsHashChatRoom.put(CHAT_ROOMS, redisChattingRoom.getRoomId(), redisChattingRoom);
+        Long success = roomService.createChattingRoom(name, redisChattingRoom.getRoomId(), member);
+
+        if(success == null){
+            throw new IllegalArgumentException();
+        }
+
+        return redisChattingRoom;
     }
 
     // 유저가 입장한 채팅방 ID와 유저의 세션 ID 매핑 정보 저장
@@ -88,4 +90,6 @@ public class ChatRoomRepository {
     public long minusUserCount(String roomId){
         return Optional.ofNullable(valueOps.decrement(USER_COUNT + "_" + roomId)).orElse(0L);
     }
+
+
 }

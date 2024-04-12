@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <!-- 웹소켓 사용시에도 CSRF 토큰을 전달해야 함 -->
   <meta id="_csrf" name="_csrf" th:content="${_csrf.token}"/>
@@ -20,30 +20,41 @@
 <body>
 <header th:replace="~{/fragment/header.html}" ></header>
 <div class="container" id="app" v-cloak>
-  <div class="col-md-6">
-    <div class="col-md-6">
-      <h4>
-        {{roomName}}
-        <span class="badge badge-info badge-pill">{{userCount}}</span>
-        <a class="btn btn-info btn-sm" href="/chat/room">채팅방 나가기</a>
-      </h4>
+  <div class="row">
+    <div class="col-md-8">
+      <div class="col-md-12">
+        <h4>
+          {{roomName}}
+          <span class="badge badge-info badge-pill">{{userCount}}</span>
+          <a class="btn btn-info btn-sm" href="/chat/room" @click="unsubscribeRoom()">채팅방 나가기</a>
+        </h4>
+      </div>
+      <div class="col-md-12">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <label class="input-group-text">내용</label>
+          </div>
+          <input type="text" class="form-control" v-model="message" v-on:keypress.enter="sendMessage('TALK')">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button" @click="sendMessage('TALK')">보내기</button>
+          </div>
+        </div>
+        <ul class="list-group" style="max-height: 300px; overflow-y: auto;">
+          <li class="list-group-item" v-for="message in messages">
+            {{message.sender}} - {{message.message}}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <h4>현재 참여 중인 유저</h4>
+      <ul class="list-group">
+        <li class="list-group-item" v-for="user in users">
+          {{user}}
+        </li>
+      </ul>
     </div>
   </div>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <label class="input-group-text">내용</label>
-    </div>
-    <input type="text" class="form-control" v-model="message" v-on:keypress.enter="sendMessage('TALK')">
-    <div class="input-group-append">
-      <button class="btn btn-primary" type="button" @click="sendMessage('TALK')">보내기</button>
-    </div>
-  </div>
-  <ul class="list-group">
-    <li class="list-group-item" v-for="message in messages">
-      {{message.sender}} - {{message.message}}</a>
-    </li>
-  </ul>
-  <div></div>
 </div>
 <!-- JavaScript -->
 <script src="/webjars/vue/2.5.16/dist/vue.min.js"></script>
@@ -75,33 +86,71 @@
         }
       },
       userCount: 0,
-      username: ''
+      username: '',
+      sub : null,
+      users: []
     },
-    created() {
+    created() { //vue 인스턴스 생성수 연결
       this.roomId = localStorage.getItem('wschat.roomId');
       this.roomName = localStorage.getItem('wschat.roomName');
       var _this = this;
-      ws.connect({}, function(frame) {
-        ws.subscribe("/sub/chat/room/" + _this.roomId, function(message){
+      ws.connect({}, function(frame) { // websocket 연결 요청, 성공시 function(frame)동작
+        _this.sub = ws.subscribe("/sub/chat/room/" + _this.roomId, function(message){ //구독
           var recv = JSON.parse(message.body);
           _this.recvMessage(recv);
         }, _this.csrfConfig);
+        console.log(this.sub);
       }, function(error){
         alert("서버 연결에 실패했습니다. 다시 시도해 주세요.");
         location.href="/chat/room";
       });
-      // axios.get("/chat/user").then(response => {
-      //   _this.username = response.body;
-      // })
+      _this.attendingUser();
     },
     methods: {
       sendMessage: function() {
+        //destiation으로 header를 들고 전송, body는 반드시 string 형태, (JSON)
         ws.send("/pub/chat/message", this.csrfConfig, JSON.stringify({type:'TALK', roomId:this.roomId, message:this.message}));
         this.message = '';
       },
       recvMessage: function(recv) {
         this.userCount = recv.userCount;
-        this.messages.unshift({"type":recv.type,"sender":recv.sender,"message":recv.message})
+        this.messages.unshift({"type": recv.type, "sender": recv.sender, "message": recv.message});
+        //퇴장처리를 했을때 채팅방 리스트에서 제거
+        if(recv.type === 'QUIT'){
+          const username = recv.message.split("님")[0];
+          const index = this.users.indexOf(username);
+          if(index !== -1){
+            this.users.splice(index, 1);
+          }
+        }
+        //새로운 유저 입장 --> 리스트 추가
+        if(recv.type === 'ENTER'){
+          const username = recv.message.split("님")[0];
+          this.users.push(username);
+        }
+      },
+      unsubscribeRoom: function(){
+        if(confirm("정말 채팅방에서 나가시겠습니까?")){
+          if(this.sub == null){
+            alert('sub is null')
+          }
+          else {
+            this.sub.unsubscribe();
+            alert('퇴장하였습니다.');
+          }
+        }
+      },
+      attendingUser: function(){
+        const _this = this;
+        axios.get('/chat/participants', {
+          params: {
+            roomId: _this.roomId
+          }
+        }).then(
+                response => {
+                  _this.users = response.data
+                }
+        ).catch(response => alert('채팅방에 참여중인 유저를 가져오지 못했습니다.'))
       }
     }
   });

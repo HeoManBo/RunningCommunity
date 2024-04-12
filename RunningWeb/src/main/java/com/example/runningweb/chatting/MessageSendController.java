@@ -1,10 +1,12 @@
 package com.example.runningweb.chatting;
 
 
-import com.example.runningweb.chatting.Repository.ChatRoomRepository;
+import com.example.runningweb.chatting.Repository.RedisChatRoomRepository;
 import com.example.runningweb.chatting.domain.ChattingMessage;
 import com.example.runningweb.chatting.service.ChatService;
+import com.example.runningweb.domain.Member;
 import com.example.runningweb.security.MemberUserDetails;
+import com.example.runningweb.util.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -18,9 +20,6 @@ import java.security.Principal;
 @Controller
 @Slf4j
 public class MessageSendController {
-
-//    private final RedisPublisherService publisher;
-//    private final ChatRoomRepository chatRoomRepository;
 
     // /pub/chat/message 로 발행된 문자를 처리하여 구독자에게 전송한다.
     // 구독자는 웹단에서 /sub/chat/room/{roomId}를 구독하면 된다.
@@ -37,7 +36,8 @@ public class MessageSendController {
 
 
     private final ChatService chatService;
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepository chatRoomRepository;
+
 
     /**
      * /pub/chat/message 로 들어온 메세지를 처리
@@ -48,9 +48,10 @@ public class MessageSendController {
 
         message.setSender(username);
         message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
-
+        Member member = Utils.extractLoginMember(principal);
+        if(member == null) throw new IllegalArgumentException("잘못된 메세지 전송");
         // redis로 발행
-        chatService.sendChatMessage(message);
+        chatService.sendChatMessage(message, member);
     }
 
 

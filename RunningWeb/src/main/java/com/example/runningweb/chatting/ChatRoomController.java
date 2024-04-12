@@ -1,9 +1,13 @@
 package com.example.runningweb.chatting;
 
 
-import com.example.runningweb.chatting.Repository.ChatRoomRepository;
-import com.example.runningweb.chatting.domain.ChattingRoom;
+import com.example.runningweb.chatting.Repository.RedisChatRoomRepository;
+import com.example.runningweb.chatting.domain.RedisChattingRoom;
+import com.example.runningweb.dto.AttendingRoomRequest;
+import com.example.runningweb.repository.ChattingRoomRepository;
 import com.example.runningweb.security.MemberUserDetails;
+import com.example.runningweb.service.ChattingRoomService;
+import com.example.runningweb.service.EnteredRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,7 +25,8 @@ import java.util.List;
 @RequestMapping("/chat")
 public class ChatRoomController {
 
-    private final ChatRoomRepository chatRoomRepository;
+    private final RedisChatRoomRepository chatRoomRepository;
+    private final EnteredRoomService roomService;
 
     //채팅방 view
     @GetMapping("/room")
@@ -32,18 +37,19 @@ public class ChatRoomController {
     //채팅방 목록 반환
     @GetMapping("/rooms")
     @ResponseBody
-    public List<ChattingRoom> allRoom() {
-        List<ChattingRoom> chatRooms = chatRoomRepository.findAllRoom();
-        chatRooms.forEach(chattingRoom -> chattingRoom.
-                setUserCount(chatRoomRepository.getUserCount(chattingRoom.getRoomId())));
+    public List<RedisChattingRoom> allRoom() {
+        List<RedisChattingRoom> chatRooms = chatRoomRepository.findAllRoom();
+        chatRooms.forEach(redisChattingRoom -> redisChattingRoom.
+                setUserCount(chatRoomRepository.getUserCount(redisChattingRoom.getRoomId())));
         return chatRooms;
     }
 
     //채팅방 생성
     @PostMapping("/room")
     @ResponseBody
-    public ChattingRoom createRoom(@RequestParam(name = "name") String roomName) {
-        return chatRoomRepository.createChattingRoom(roomName);
+    public RedisChattingRoom createRoom(@RequestParam(name = "name") String roomName,
+                                        @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
+        return chatRoomRepository.createChattingRoom(roomName, memberUserDetails.getMember());
     }
 
     // 채팅방 입장 화면
@@ -56,17 +62,31 @@ public class ChatRoomController {
     //특정 채팅방 조회
     @GetMapping("/room/{roomId}")
     @ResponseBody
-    public ChattingRoom roomInfo(@PathVariable(name = "roomId") String roomId) {
+    public RedisChattingRoom roomInfo(@PathVariable(name = "roomId") String roomId) {
         return chatRoomRepository.findById(roomId);
     }
-
 
 
     // chatting 방에 접속한 유저의 정보를 반환함.
     @GetMapping("/user")
     @ResponseBody
-    public String getUserName(@AuthenticationPrincipal MemberUserDetails userDetails){
+    public String getUserName(@AuthenticationPrincipal MemberUserDetails userDetails) {
         return userDetails.getMember().getNickname();
     }
 
+
+    // 현재 유저가 참여 중인 채팅방을 반환한다.
+    @ResponseBody
+    @GetMapping("/attend")
+    public List<AttendingRoomRequest> attendingRoom(@AuthenticationPrincipal MemberUserDetails memberUserDetails) {
+        return roomService.findAttendingRoom(memberUserDetails.getMember());
+    }
+
+
+    //현재 채팅방의 참여한 유저들의 닉네임을 반환한다.
+    @ResponseBody
+    @GetMapping("/participants")
+    public List<String> getParticipants(@RequestParam("roomId") String roomId) {
+        return roomService.getParticipants(roomId);
+    }
 }
