@@ -50,7 +50,7 @@ public class StompHandler implements ChannelInterceptor {
             //이미 접속하지 않은 상태면 입장 메세지를 보냄
             if(!isIn){
                 log.info("NEWER USER = {}, CONNECT ROOM = {}", username, roomId);
-                enteredRoomService.enterRoom(roomId, member);
+                enteredRoomService.enterRoom(roomId, member); //저장
                 chatService.sendChatMessage(ChattingMessage.builder().sender(username).roomId(roomId).type(MessageType.ENTER).build(), member);
             }
         }

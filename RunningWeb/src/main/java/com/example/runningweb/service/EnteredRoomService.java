@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,6 @@ public class EnteredRoomService {
 
         return isIn;
     }
-
 
     // 퇴장 처리
     @Transactional
@@ -81,5 +81,18 @@ public class EnteredRoomService {
     public List<String> getParticipants(String roomId) {
         ChattingRoom room = roomRepository.findByUuid(roomId);
         return enteredRoomRepository.findParticipants(room);
+    }
+
+    @Transactional(readOnly = true)
+    public EnteredRoom getEnterHistory(String roomId, Member member) {
+        ChattingRoom room = roomRepository.findByUuid(roomId);
+        //일단 해당 방에 접근 기록이 있는지 확인한다.
+        List<EnteredRoom> enteredInfo = enteredRoomRepository.getEnteredInfo(room, member);
+
+        if(enteredInfo.size() != 1){ // 아무런 채팅메세지가 있지 않은 것 반환
+            return null;
+        }
+
+        return enteredInfo.get(0);
     }
 }

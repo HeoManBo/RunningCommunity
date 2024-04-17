@@ -39,4 +39,7 @@ public interface EnteredRoomRepository extends JpaRepository<EnteredRoom, Long> 
     //roomId에 참여중인 멤버들의 정보를 반환한다.
     @Query("select er.member.nickname from EnteredRoom er join er.member where er.chattingRoom = :chattingRoom")
     List<String> findParticipants(@Param("chattingRoom") ChattingRoom chattingRoom);
+
+    @Query("select er from EnteredRoom er where er.chattingRoom = :room and er.member = :member")
+    List<EnteredRoom> getEnteredInfo(@Param("room") ChattingRoom room, @Param("member") Member member);
 }
