@@ -21,9 +21,12 @@
     <div class="col-md-12">
       <h3>채팅방 리스트</h3>
     </div>
-    <div class="col-md-1 text-right">
-      <button class="btn btn-primary" th:onclick="">참여중인 채팅방</button>
-    </div>
+    <template>
+      <div class="col-md-1 text-right">
+        <button v-if="allRoom" class="btn btn-primary" @click="attendRoom">참여중인 채팅방</button>
+        <button v-else class="btn btn-primary" @click="findAllRoom">전체 개설된 방</button>
+      </div>
+    </template>
   </div>
   <div class="input-group">
     <div class="input-group-prepend">
@@ -52,19 +55,24 @@
   Vue.prototype.$csrf = csrfToken
   Vue.prototype.$csrfHeader = csrfHeader
 
+  var allRoom = true
+
   var vm = new Vue({
     el: '#app',
     data: {
       room_name : '',
       chatrooms: [
-      ]
+      ],
     },
     created() {
       this.findAllRoom();
     },
     methods: {
       findAllRoom: function() {
-        axios.get('/chat/rooms').then(response => { this.chatrooms = response.data; });
+        axios.get('/chat/rooms').then(response => {
+          allRoom = true
+          this.chatrooms = response.data;
+        });
       },
       createRoom: function() {
         if("" === this.room_name) {
@@ -93,6 +101,16 @@
           localStorage.setItem('wschat.roomId',roomId);
           localStorage.setItem('wschat.roomName',roomName);
           location.href="/chat/room/enter/"+roomId;
+      },
+      attendRoom: function(){
+        axios.get('/chat/attend')
+                .then(
+                        response => {
+                          allRoom = false;
+                          this.chatrooms = response.data;
+                        }
+                ).catch(response => { alert('참여중인 방 확인이 실패했습니다.')});
+
       }
     }
   });

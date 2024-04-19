@@ -60,7 +60,7 @@ public class MessageService {
             if(message.getCreatedAt().isAfter(exitTime)){
                 if(first){
                     first = false;
-                    result.add(new MessageHistoryResponse("-----------", "퇴장 이후 전송된 메세지---------------"));
+                    result.add(new MessageHistoryResponse("-----------", "퇴장 이후 메세지---------------"));
                 }
             }
             result.add(new MessageHistoryResponse(message.getWriter().getNickname(), message.getMessage()));
