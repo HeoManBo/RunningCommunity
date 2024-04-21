@@ -10,8 +10,7 @@ import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,5 +67,26 @@ public class CommentService {
     // boardId 에 해당하는 모든 게시글을 삭제함.
     public void deleteComments(Board board) {
         commentRepository.deleteByBoard(board);
+    }
+
+    public List<CommentDto> getCommentsWithHier(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("잘못된 Board번호입니다."));
+        List<Comment> comments = commentRepository.findByHier(board);
+
+        Map<Long, CommentDto> commentMap = new HashMap<>();
+        List<CommentDto> commentDtos = new ArrayList<>();
+        comments.forEach(c -> {
+            CommentDto dto = CommentDto.builder()
+                    .comment_id(c.getId())
+                    .wroteAt(c.getCreatedAt())
+                    .writer_id(c.getMember().getId())
+                    .content(c.getContent())
+                    .writer(c.getMember().getNickname()).build();
+            commentMap.put(dto.getComment_id(), dto);
+            if (c.getParent() != null) commentMap.get(c.getParent().getId()).addChild(dto);
+            else commentDtos.add(dto);
+        });
+
+        return commentDtos;
     }
 }

@@ -48,7 +48,7 @@
           <textarea sec:authorize="isAuthenticated()" id="comment_content" type="text" th:field="*{content}" placeholder="댓글을 입력하세요"></textarea>
           <textarea sec:authorize="!isAuthenticated()" th:text="|로그인한 유저만 댓글 작성이 가능합니다.|" readonly></textarea>
         </div>
-        <button  sec:authorize="isAuthenticated()" type="submit" class="btn btn-primary">댓글 작성</button>
+        <button sec:authorize="isAuthenticated()" type="submit" class="btn btn-primary">댓글 작성</button>
       </form>
     </div>
   </div>
@@ -99,23 +99,25 @@
         comments.forEach(function (comment) {
           console.log(comment.writer_id);
           var date = new Date(comment.wroteAt)
-          const formattedDate =  `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+          const formattedDate = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+          var comment_id = 'comment' + comment.comment_id;
           commenthtml += `
-                <div class="list-group-item" data-comment-id="${comment.comment_id}">
+                <div class="list-group-item" id="${comment_id}">
                       <div class="d-flex justify-content-between">
                         <span>
                         ${comment.writer}
+                        ${userId === comment.writer_id ? `
+                          <button id="deleteBtn" class="btn btn-sm btn-danger justify-content-end" data-comment-id="${comment.comment_id}">삭제</button>
+                          <button id="updateBtn" class="btn btn-sm btn-warning justify-content-end" data-comment-id="${comment.comment_id}">수정</button>
+                        ` : ``}
                         </span>
                         <small class="text-muted">
                         ${formattedDate}
                         </small>
                       </div>
-                      <p class="mt-2">${comment.content}</p>
+                      <p class="mt-2" id="content">${comment.content}</p>
                       ${userId === comment.writer_id ? `
-                     <span>
-                     <button id="deleteBtn" class="btn btn-sm btn-danger" data-comment-id="${comment.comment_id}">삭제</button>
-                     <button id="updateBtn" class="btn btn-sm btn-warning" data-comment-id="${comment.comment_id}">수정</button>
-                    </span>
+                    </div>
                 ` : ``}
                     </div>
            `;
@@ -142,31 +144,80 @@
 
     // 수정 버튼 클릭 시
     if (target.matches('#updateBtn')) {
-      const commentId = target.dataset.commentId;
-      //updateComment(commentId);
+      let commentId = target.dataset.commentId;
+      let test = document.getElementById('comment' + commentId).querySelector('#content').textContent;
+      updateComment(commentId, test);
       alert('수정 버튼 클릭')
+      alert(test)
     }
   }
 
 
   function deleteComment(commentId) {
-    $.ajax({
-      url: `/comment/${commentId}`,
-      type: "delete",
-      beforeSend: function(request) {
-        request.setRequestHeader(csrf_header, csrf_token);
-      },
-      success: function() {
-        alert('댓글 삭제에 성공했습니다.');
-        loadComments();
-      },
-      error: function() {
-        alert('댓글 삭제에 실패했습니다.');
+    if(confirm("정말 삭제하시겠습니까?")){
+      $.ajax({
+        url: `/comment/${commentId}`,
+        type: "delete",
+        beforeSend: function(request) {
+          request.setRequestHeader(csrf_header, csrf_token);
+        },
+        success: function() {
+          alert('댓글 삭제에 성공했습니다.');
+          loadComments();
+        },
+        error: function() {
+          alert('댓글 삭제에 실패했습니다.');
+        }
+      });
+    }
+  }
+  function updateComment(commentId, originalContent) {
+    const commentElement = $(`div[data-comment-id="${commentId}"]`);
+    const commentText = commentElement.find('.comment-text');
+    const commentContent = commentText.text();
+    var commentDiv = document.querySelector(`#content[data-comment-id="${commentId}"]`);
+
+    // 댓글 내용을 수정할 수 있는 입력 필드와 버튼 생성
+    const editForm = $(`
+    <div class="edit-form">
+         <textarea id="editContent">${originalContent}</textarea>
+        <button id="saveEdit" data-comment-id="${commentId}">수정하기</button>
+         <button id="cancelEdit" data-comment-id="${commentId}">취소</button>
+    </div>
+  `);
+
+    // 기존 댓글 내용 숨기기, 편집 폼 보여주기
+    commentText.hide();
+    commentElement.append(editForm);
+
+    // '취소' 버튼 클릭 이벤트 핸들러
+    commentElement.find('.cancel-edit-btn').on('click', function() {
+      editForm.remove();
+      commentText.show();
+    });
+
+    // '저장' 버튼 클릭 이벤트 핸들러
+    commentElement.find('.save-comment-btn').on('click', function() {
+      const updatedContent = commentElement.find('.comment-input').val().trim();
+      if (updatedContent) {
+        // 서버로 수정된 댓글 내용 전송
+        sendUpdatedComment(commentId, updatedContent);
       }
     });
   }
 
-
+  function sendUpdatedComment(commentId, updatedContent) {
+    $.ajax({
+      url: `/comment/${commentId}`,
+      type: "PUT",
+      data: { content: updatedContent },
+      success: function(response) {
+        // 댓글 수정 성공 후 처리
+        loadComments();
+      },
+      error: handleError
+    });
+  }
 
   $('#comment-form').submit(function(event){
     event.preventDefault(); // 폼 제출 기본 동작 방지

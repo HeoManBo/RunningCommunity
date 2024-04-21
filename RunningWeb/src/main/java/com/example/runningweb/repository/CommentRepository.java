@@ -28,4 +28,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Modifying
     void deleteByBoard(Board board);
+
+    @Query("select c from Comment c join fetch c.member left join fetch c.parent where c.board = :board order by c.parent.id asc nulls first, " +
+            "c.createdAt asc")
+    List<Comment> findByHier(@Param("board") Board board);
 }

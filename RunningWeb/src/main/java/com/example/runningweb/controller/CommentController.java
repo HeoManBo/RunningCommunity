@@ -24,7 +24,7 @@ public class CommentController {
     // 비동기형 처리로 가져오므로 ResponseBody를 붙이자.
     @GetMapping("/comment/{boardId}")
     @ResponseBody
-    public List<CommentDto> commentList(@PathVariable(name = "boardId") Long boardId, RedirectAttributes redirectAttributes){
+    public List<CommentDto> commentList(@PathVariable(name = "boardId") Long boardId){
         return commentService.commentDtos(boardId);
     }
 
@@ -60,6 +60,12 @@ public class CommentController {
         if(memberUserDetails == null){ // API 호출 방지
             throw new IllegalArgumentException("비회원은 댓글을 달 수 없습니다.");
         }
+    }
+
+    @ResponseBody
+    @GetMapping("/comment/test")
+    public List<CommentDto> getTest(@RequestParam(name = "boardId") Long boardId) {
+        return commentService.getCommentsWithHier(boardId);
     }
 
 }

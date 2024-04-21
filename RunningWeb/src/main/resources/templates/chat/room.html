@@ -21,20 +21,26 @@
     <div class="col-md-12">
       <h3>채팅방 리스트</h3>
     </div>
-    <template>
-      <div class="col-md-1 text-right">
+      <div class="col-md-12">
         <button v-if="allRoom" class="btn btn-primary" @click="attendRoom">참여중인 채팅방</button>
         <button v-else class="btn btn-primary" @click="findAllRoom">전체 개설된 방</button>
       </div>
-    </template>
   </div>
   <div class="input-group">
+<!--    <select class="form-select" id="region" v-model="selectedRegion">-->
+<!--      <option selected>지역</option>-->
+<!--      <option value="1">서울</option>-->
+<!--      <option value="2">대구</option>-->
+<!--      <option value="3">부산</option>-->
+
+<!--      <option v-for="region in regions" :key="region.id" :value="region.id">{{ region.name }}</option>-->
+<!--    </select>-->
     <div class="input-group-prepend">
       <label class="input-group-text">방제목</label>
     </div>
     <input type="text" class="form-control" v-model="room_name" v-on:keyup.enter="createRoom">
     <div class="input-group-append">
-      <button class="btn btn-primary" type="button" @click="createRoom">채팅방 개설</button>
+        <button class="btn btn-primary" type="button" @click="createRoom">채팅방 개설</button>
     </div>
   </div>
   <ul class="list-group">
@@ -63,6 +69,8 @@
       room_name : '',
       chatrooms: [
       ],
+      // regions: ['서울', '대구', '부산', '경기'],
+      // selectedRegion: null
     },
     created() {
       this.findAllRoom();
