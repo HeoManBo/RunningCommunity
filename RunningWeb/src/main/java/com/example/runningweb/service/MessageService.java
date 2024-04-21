@@ -63,7 +63,10 @@ public class MessageService {
                     result.add(new MessageHistoryResponse("-----------", "퇴장 이후 메세지---------------"));
                 }
             }
-            result.add(new MessageHistoryResponse(message.getWriter().getNickname(), message.getMessage()));
+            if (message.getMessage().contains("습니다.")) {
+                result.add(new MessageHistoryResponse("알림", message.getMessage()));
+            }
+            else result.add(new MessageHistoryResponse(message.getWriter().getNickname(), message.getMessage()));
         }
 
         //다시 역순으로..????

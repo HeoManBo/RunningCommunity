@@ -62,8 +62,9 @@ public class CommentController {
         }
     }
 
-    @ResponseBody
-    @GetMapping("/comment/test")
+    //대댓글 테스트
+    //@ResponseBody
+    //@GetMapping("/comment/test")
     public List<CommentDto> getTest(@RequestParam(name = "boardId") Long boardId) {
         return commentService.getCommentsWithHier(boardId);
     }

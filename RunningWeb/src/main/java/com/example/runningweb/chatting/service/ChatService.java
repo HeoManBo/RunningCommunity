@@ -16,13 +16,12 @@ import org.springframework.stereotype.Service;
 public class ChatService {
 
     private final ChannelTopic topic;
-    //private final RedisTemplate<String, Object> template;
     private final RedisTemplate<String, Object> template;
     private final RedisChatRoomRepository roomRepository;
     private final MessageService messageService;
 
     /**
-     * destination 정보에서 roomId ㅊ출
+     * destination 정보에서 roomId 추출
      */
     public String getRoomId(String destination)
     {

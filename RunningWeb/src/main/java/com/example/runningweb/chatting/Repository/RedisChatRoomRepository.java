@@ -1,16 +1,13 @@
 package com.example.runningweb.chatting.Repository;
 
 import com.example.runningweb.chatting.domain.RedisChattingRoom;
-import com.example.runningweb.domain.ChattingRoom;
 import com.example.runningweb.domain.Member;
-import com.example.runningweb.repository.ChattingRoomRepository;
 import com.example.runningweb.service.ChattingRoomService;
 import com.example.runningweb.service.EnteredRoomService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,11 +45,11 @@ public class RedisChatRoomRepository {
 
     // 채팅방 생성 : 서버간 공유를 위해 Redis에 저장한다.
     @Transactional
-    public RedisChattingRoom createChattingRoom(String name, Member member) {
-        RedisChattingRoom redisChattingRoom = new RedisChattingRoom(name);
+    public RedisChattingRoom createChattingRoom(String name, String region, Member member) {
+        RedisChattingRoom redisChattingRoom = new RedisChattingRoom(name, region);
 
         opsHashChatRoom.put(CHAT_ROOMS, redisChattingRoom.getRoomId(), redisChattingRoom);
-        Long success = roomService.createChattingRoom(name, redisChattingRoom.getRoomId(), member);
+        Long success = roomService.createChattingRoom(name, redisChattingRoom.getRoomId(), region, member);
 
         if(success == null){
             throw new IllegalArgumentException();

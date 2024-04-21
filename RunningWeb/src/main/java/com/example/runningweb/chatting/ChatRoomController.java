@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 채팅방 관리를 위한 컨트롤러
@@ -44,19 +45,29 @@ public class ChatRoomController {
     //채팅방 목록 반환
     @GetMapping("/rooms")
     @ResponseBody
-    public List<RedisChattingRoom> allRoom() {
+    public List<RedisChattingRoom> allRoom(@RequestParam(name = "region", required = false) String region) {
+        log.info("선택한 지역 = {}", region);
         List<RedisChattingRoom> chatRooms = chatRoomRepository.findAllRoom();
         chatRooms.forEach(redisChattingRoom -> redisChattingRoom.
                 setUserCount(chatRoomRepository.getUserCount(redisChattingRoom.getRoomId())));
-        return chatRooms;
+        if (region == null) {
+            return chatRooms;
+        } else {
+            List<RedisChattingRoom> filter = chatRooms.stream().filter(cr -> cr.getRegion().contains(region))
+                    .toList();
+            filter.forEach(redisChattingRoom -> redisChattingRoom.
+                    setUserCount(chatRoomRepository.getUserCount(redisChattingRoom.getRoomId())));
+            return filter;
+        }
     }
 
     //채팅방 생성
     @PostMapping("/room")
     @ResponseBody
     public RedisChattingRoom createRoom(@RequestParam(name = "name") String roomName,
+                                        @RequestParam(name = "region") String region,
                                         @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
-        return chatRoomRepository.createChattingRoom(roomName, memberUserDetails.getMember());
+        return chatRoomRepository.createChattingRoom(roomName, region, memberUserDetails.getMember());
     }
 
     // 채팅방 입장 화면

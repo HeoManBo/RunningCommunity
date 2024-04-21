@@ -16,10 +16,12 @@ public class RedisChattingRoom implements Serializable {
 
     private final String roomId; // UUID
     private String name; //방 제목
+    private String region; //지역
     private long userCount; //유저 수
 
-    public RedisChattingRoom(String name) {
+    public RedisChattingRoom(String name, String region) {
         this.name = name;
+        this.region = region;
         this.roomId = UUID.randomUUID().toString();
     }
 

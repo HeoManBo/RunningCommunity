@@ -1,6 +1,7 @@
 package com.example.runningweb.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class ChattingRoom extends BaseEntity {
     private String region;
     private String uuid;
 
+    @JsonIgnore // Redis 저장시 무시
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;

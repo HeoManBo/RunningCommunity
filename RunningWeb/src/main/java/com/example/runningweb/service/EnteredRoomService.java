@@ -71,7 +71,7 @@ public class EnteredRoomService {
 
         return list.stream()
                 .map(l -> {
-                    AttendingRoomRequest req = new AttendingRoomRequest(l.getUuid(), l.getTitle());
+                    AttendingRoomRequest req = new AttendingRoomRequest(l.getUuid(), l.getTitle(), l.getRegion());
                     req.setUserCount(enteredRoomRepository.countInUser(l));
                     return req;
                 }).toList();
