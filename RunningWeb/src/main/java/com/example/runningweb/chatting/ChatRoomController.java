@@ -11,6 +11,7 @@ import com.example.runningweb.security.MemberUserDetails;
 import com.example.runningweb.service.ChattingRoomService;
 import com.example.runningweb.service.EnteredRoomService;
 import com.example.runningweb.service.MessageService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 

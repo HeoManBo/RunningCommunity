@@ -93,10 +93,16 @@
       this.findAllRoom(null);
     },
     methods: {
-      findAllRoom: function() {
-        var params = new URLSearchParams();
-        params.append("region", this.searchRegion);
-        axios.get('/chat/rooms', params).then(response => {
+      findAllRoom: function () {
+        // var params = new URLSearchParams();
+        // console.log(this.searchRegion);
+        // params.append("region", this.searchRegion);
+        // axios.get('/chat/rooms', params) -> 해당 요청은 requestParam 이 안찍힘;
+        axios.get('/chat/rooms', {
+          params: {
+            region: this.searchRegion
+          }
+        }).then(response => {
           allRoom = true
           this.chatrooms = response.data;
         });
@@ -147,7 +153,7 @@
       },
       setSearchRegion(event){
         this.searchRegion = event.target.value;
-        this.findAllRoom(this.searchRegion);
+        this.findAllRoom();
       }
     }
   });
