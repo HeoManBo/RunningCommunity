@@ -12,3 +12,6 @@
 
 아키텍쳐 
 
+![image](https://github.com/HeoManBo/RunningCommunity/assets/93931871/f8e9cbf2-e428-4a6d-b051-73470e52e369)
+
+
