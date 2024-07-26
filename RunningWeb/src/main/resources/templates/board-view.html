@@ -8,7 +8,7 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
-<header th:replace="~{/fragment/header.html}" ></header>
+<header th:replace="~{fragment/header.html}"> </header>
 <div class="container-sm" th:object="${boardViewDto}">
   <div class="card">
     <div class="card-header">
@@ -31,12 +31,14 @@
     </div>
     <div class="card-body">
       <p th:text="*{content}">내용</p>
-      <p th:each="file : ${boardViewDto.getAttachFiles()}">
-<!--        <a th:if="${file.extractExt() == 'PNG' || file.extractExt() == 'JPG' || file.extractExt() == 'jpg' || file.extractExt() == 'png'}">-->
-<!--          <img id="img" th:src="@{|/image/${file.serverFileName}|}" alt="no image" height="100" width="100">-->
-<!--        </a>-->
-        <a href="#" th:text="${file.originalName}">file_name</a>
-      </p>
+      <div class="row">
+        <div th:each="file : ${boardViewDto.getAttachFiles()}" class="col-md-6">
+          <a th:if="${file.extractExt() == 'PNG' || file.extractExt() == 'JPG' || file.extractExt() == 'jpg' || file.extractExt() == 'png'}" class="d-block mb-2">
+            <img id="img" th:src="@{|/attach/images/${file.serverFileName}|}" alt="이미지 로딩 실패" class="img-fluid" style="max-height: 500px; max-width: 500px;">
+          </a>
+          <a th:href="@{/file/{serverFileName}(serverFileName=${file.serverFileName})}" th:text="${file.originalName}" class="d-block">file_name</a>
+        </div>
+      </div>
     </div>
   </div>
   <!-- 댓글 작성 폼 -->
