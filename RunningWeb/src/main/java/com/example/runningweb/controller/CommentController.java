@@ -1,6 +1,7 @@
 package com.example.runningweb.controller;
 
 import com.example.runningweb.dto.CommentDto;
+import com.example.runningweb.dto.UpdateCommentRequest;
 import com.example.runningweb.security.MemberUserDetails;
 import com.example.runningweb.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -55,9 +56,20 @@ public class CommentController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/comment/{commentId}")
+    @ResponseBody
+    public ResponseEntity<Void> updateComment(@PathVariable("commentId") Long commentId,
+                                              @RequestBody UpdateCommentRequest request,
+                                              @AuthenticationPrincipal MemberUserDetails memberUserDetails) {
+        checkLoginUser(memberUserDetails);
+
+        commentService.updateComment(commentId, memberUserDetails.getMember(), request);
+        return ResponseEntity.ok().build();
+    }
+
     // 로그인한 유저인지 확인한다.
     private void checkLoginUser(MemberUserDetails memberUserDetails) {
-        if(memberUserDetails == null){ // API 호출 방지
+        if (memberUserDetails == null) { // API 호출 방지
             throw new IllegalArgumentException("비회원은 댓글을 달 수 없습니다.");
         }
     }

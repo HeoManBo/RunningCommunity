@@ -23,7 +23,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     //삭제할 쿼리 하나를 가져옴 --> 없으면 NULL;
     // @Query("select c from (select cc from Comment as cc where cc.id = :comment_id) as c join fetch c.member ")
     @Query("select c from Comment c join fetch c.member where c.id = :comment_id")
-    Optional<Comment> getDeletedComment(@Param("comment_id") Long comment_id);
+    Optional<Comment> getCommentWithMember(@Param("comment_id") Long comment_id);
 
 
     @Modifying

@@ -4,11 +4,12 @@ import com.example.runningweb.domain.Board;
 import com.example.runningweb.domain.Comment;
 import com.example.runningweb.domain.Member;
 import com.example.runningweb.dto.CommentDto;
+import com.example.runningweb.dto.UpdateCommentRequest;
 import com.example.runningweb.repository.BoardRepository;
 import com.example.runningweb.repository.CommentRepository;
-import jakarta.validation.constraints.Null;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,6 +35,7 @@ public class CommentService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     public Long createComment(CommentDto commentDto, Long boardId, Member member){
         Optional<Board> findBoard = boardRepository.findById(boardId); //게시글 찾기
         if(findBoard.isEmpty()) throw new IllegalArgumentException("잘못된 게시글 번호입니다.");
@@ -51,13 +53,11 @@ public class CommentService {
     //댓글 삭제
     public void deleteComment(Long commentId, Member member) {
         //잘못된 댓글 요청이면
-        Comment comment = commentRepository.getDeletedComment(commentId)
+        Comment comment = commentRepository.getCommentWithMember(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 삭제 요청입니다."));
 
         //자신이 작성하지 않은 댓글을 삭제하려는 경우
-        if(!comment.getMember().getId().equals(member.getId())){
-            throw new IllegalArgumentException("다른 사람의 댓글을 삭제할 수 없습니다.");
-        }
+        checkCommentOwner(member, comment);
 
         //댓글 삭제 처리
         // findBy 이후에 Delete 로 select 쿼리가 한 번더 나감
@@ -89,4 +89,23 @@ public class CommentService {
 
         return commentDtos;
     }
+
+    @Transactional
+    public void updateComment(Long commentId, Member member, UpdateCommentRequest request) {
+        Comment comment = commentRepository
+                .getCommentWithMember(commentId).orElseThrow(() -> new IllegalArgumentException("잘못된 댓글입니다."));
+
+        checkCommentOwner(member, comment);
+
+        comment.updateComment(request.getUpdateComment());
+    }
+
+
+    // 수정 가능한지 검증
+    private void checkCommentOwner(Member member, Comment comment) {
+        if(!comment.getMember().getId().equals(member.getId())){
+            throw new IllegalArgumentException("다른 사람의 댓글을 조작할 수 없습니다.");
+        }
+    }
+
 }
