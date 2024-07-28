@@ -3,6 +3,7 @@ package com.example.runningweb.service;
 import com.example.runningweb.domain.Board;
 import com.example.runningweb.domain.Comment;
 import com.example.runningweb.domain.Member;
+import com.example.runningweb.dto.CommentCreateRequest;
 import com.example.runningweb.dto.CommentDto;
 import com.example.runningweb.dto.UpdateCommentRequest;
 import com.example.runningweb.repository.BoardRepository;
@@ -36,12 +37,15 @@ public class CommentService {
     }
 
     @Transactional
-    public Long createComment(CommentDto commentDto, Long boardId, Member member){
+    public Long createComment(CommentCreateRequest commentDto, Long boardId, Member member){
         Optional<Board> findBoard = boardRepository.findById(boardId); //게시글 찾기
         if(findBoard.isEmpty()) throw new IllegalArgumentException("잘못된 게시글 번호입니다.");
 
+        //부모 댓글 찾기
+        Optional<Comment> parentComment = commentRepository.findById(commentDto.getParentId());
+
         Comment comment = Comment.builder()
-                .parent(null)
+                .parent(parentComment.orElse(null))
                 .content(commentDto.getContent())
                 .board(findBoard.get())
                 .member(member).build();
@@ -69,6 +73,7 @@ public class CommentService {
         commentRepository.deleteByBoard(board);
     }
 
+    // 대댓글 조합
     public List<CommentDto> getCommentsWithHier(Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("잘못된 Board번호입니다."));
         List<Comment> comments = commentRepository.findByHier(board);

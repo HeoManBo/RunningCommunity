@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
  * Topic : 채팅방
  * pub : 메시지 전송
  * sub : 메세지 수신
+ * topic은 하나만 사용하므로 사용하지 않음
  */
 
 //@Service

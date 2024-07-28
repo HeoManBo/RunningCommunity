@@ -21,6 +21,7 @@ public class FileUtil {
     @Value("${spring.file.path}")
     private String innerPath;
 
+
     // 파일 업로드 후 DB에 저장할 객체 반환
     public AttachFile attachFile(MultipartFile multipartFile) throws IOException {
         if(multipartFile == null || multipartFile.isEmpty()){
@@ -56,7 +57,6 @@ public class FileUtil {
         for (String fileName : storedServerFileName) {
             deleteFile(fileName);
         }
-
     }
 
     public void deleteFile(String serverFileName) {
@@ -70,5 +70,15 @@ public class FileUtil {
     }
 
 
+
+    public File loadFile(String fileName) {
+        File file = new File(innerPath + fileName);
+
+        if (file.exists()) {
+            return file;
+        }
+
+        return null;
+    }
 
 }

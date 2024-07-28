@@ -14,7 +14,7 @@ import java.util.List;
 public interface FileRepository extends JpaRepository<AttachFile, Long> {
 
     @Query("select a from AttachFile a where a.board = :board")
-    public List<AttachFile> getAttachFiles(@Param("board") Board board);
+    List<AttachFile> getAttachFiles(@Param("board") Board board);
 
 
     @Modifying

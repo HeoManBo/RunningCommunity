@@ -38,3 +38,6 @@ out/
 
 *.properties
 *.yml
+*.jpg
+*.png
+*.jpeg

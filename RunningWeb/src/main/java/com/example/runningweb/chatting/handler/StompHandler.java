@@ -42,16 +42,19 @@ public class StompHandler implements ChannelInterceptor {
                     .orElse("InvalidRoomId"));
             //채팅방에 들어온 클라이언트의 sessionId를 roomId와 매핑한다. -> 특정 세션이 어느 채팅방에 있는지 알기 이해
             String sessionId = (String) message.getHeaders().get("simpSessionId");
-            redisRoomRepository.setUserEnterInfo(sessionId, roomId);
-            redisRoomRepository.addUserCount(roomId);
-
             log.info("CONNECT USER = {}, CONNECT ROOM = {}", username, roomId);
             boolean isIn = enteredRoomService.checkAlreadyInRoom(roomId, member);
-            //이미 접속하지 않은 상태면 입장 메세지를 보냄
+            //최초 접속시 갱신
             if(!isIn){
+                redisRoomRepository.setUserEnterInfo(sessionId, roomId);
+                redisRoomRepository.addUserCount(roomId);
                 log.info("NEWER USER = {}, CONNECT ROOM = {}", username, roomId);
                 enteredRoomService.enterRoom(roomId, member); //저장
-                chatService.sendChatMessage(ChattingMessage.builder().sender(username).roomId(roomId).type(MessageType.ENTER).build(), member);
+                chatService.sendChatMessage(ChattingMessage.builder()
+                        .sender(username)
+                        .roomId(roomId)
+                        .type(MessageType.ENTER)
+                        .build(), member);
             }
         }
         else if (StompCommand.DISCONNECT == accessor.getCommand()) {
@@ -63,7 +66,6 @@ public class StompHandler implements ChannelInterceptor {
             log.info("DISCONNECT USER = {}, CONNECT ROOM = {}", username, roomId);
             redisRoomRepository.removeUserEnterInfo(sessionId);
             enteredRoomService.saveExitTime(roomId, member);
-
         } else if(StompCommand.UNSUBSCRIBE == accessor.getCommand()){
             String sessionId = (String) message.getHeaders().get("simpSessionId");
             String roomId = redisRoomRepository.getUserEnterRoomId(sessionId);

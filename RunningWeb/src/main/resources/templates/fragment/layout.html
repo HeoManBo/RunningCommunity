@@ -3,17 +3,18 @@
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
 <head>
   <meta charset="UTF-8">
-  <title>Layout</title>
   <!-- CSS, JS 등 공통 리소스 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 </head>
 <body>
 <!-- 헤더 -->
-<header th:replace="fragments/header :: header"></header>
-
+<header th:replace="~{fragment/header :: HeaderFragment}"></header>
 <!-- 본문 영역 (콘텐츠가 삽입될 자리) -->
 <div layout:fragment="content"></div>
 
-<!-- 푸터 -->
-<footer th:replace="fragments/footer :: footer"></footer>
 </body>
 </html>

@@ -20,7 +20,7 @@ public class CommentDto {
     private String content; //댓글 내용
     private LocalDateTime wroteAt; //작성일자 년,월,일 시간,분
     private Long comment_id; //댓글 ID
-    private Long writer_id; // 작성자_ID
+    private Long writer_id; //작성자_ID
     private List<CommentDto> child = new ArrayList<>();
 
     @Builder

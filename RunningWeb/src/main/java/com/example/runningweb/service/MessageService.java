@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,6 +27,7 @@ public class MessageService {
 
     private final MessageRepository messageRepository;
     private final ChattingRoomRepository roomRepository;
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 
     //전송한 메세지 저장
@@ -57,6 +59,7 @@ public class MessageService {
         List<MessageHistoryResponse> result = new ArrayList<>();
         boolean first = true;
         for(Message message : messages){
+            String date = dateFormatter.format(message.getCreatedAt().minusDays(20));
             if(message.getCreatedAt().isAfter(exitTime)){
                 if(first){
                     first = false;
@@ -64,9 +67,9 @@ public class MessageService {
                 }
             }
             if (message.getMessage().contains("습니다.")) {
-                result.add(new MessageHistoryResponse("알림", message.getMessage()));
+                result.add(new MessageHistoryResponse("알림", message.getMessage(), date));
             }
-            else result.add(new MessageHistoryResponse(message.getWriter().getNickname(), message.getMessage()));
+            else result.add(new MessageHistoryResponse(message.getWriter().getNickname(), message.getMessage(), date));
         }
 
         //다시 역순으로..????

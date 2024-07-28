@@ -50,4 +50,8 @@ public class Comment extends BaseEntity {
         this.member = member;
         this.board = board;
     }
+
+    public void updateComment(String updateComment) {
+        this.content = updateComment;
+    }
 }

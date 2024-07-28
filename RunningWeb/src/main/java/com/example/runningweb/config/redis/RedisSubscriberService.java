@@ -22,7 +22,7 @@ public class RedisSubscriberService {
      *  메시지가 수신되면 sendMessage 실행
      */
     //메시지가 발행되면 adapter가 sendMessage를 수행함
-   public void sendMessage(String publishedMessage){
+    public void sendMessage(String publishedMessage){
        try{
            //객채 매핑
            ChattingMessage chattingMessage = objectMapper.readValue(publishedMessage, ChattingMessage.class);

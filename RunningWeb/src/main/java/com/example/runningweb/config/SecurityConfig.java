@@ -31,7 +31,7 @@ public class SecurityConfig {
 
     private static final String[] permitAllList = {
             "/webjars/**", "/favicon.ico", "/main", "/signup", "/login", "/error**", "/logout", "/css/**",
-            "/board/**", "/image/**", "/comment/**", "/resources**", "/static**", "/",
+            "/board/**", "/images/**", "/comment/**", "/", "/resources/**", "/attach/**"
     };
 
     private static final String[] authenticationList = {
@@ -77,5 +77,14 @@ public class SecurityConfig {
     PasswordEncoder bcrypt(){
         return new BCryptPasswordEncoder();
     }
+
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer(){
+//        return (web) ->
+//        {
+//            web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
+//        };
+//    }
+
 
 }

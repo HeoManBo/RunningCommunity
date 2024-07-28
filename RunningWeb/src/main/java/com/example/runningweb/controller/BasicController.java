@@ -20,6 +20,7 @@ public class BasicController {
     public String index(){
         return "redirect:/main";
     }
+
     @GetMapping("/main")
     public String main(Model model,
                        @RequestParam(required = false, defaultValue = "1", name = "page")
@@ -32,11 +33,5 @@ public class BasicController {
         model.addAttribute("boardList", boardListDtos);
         return "main";
     }
-
-/*    @GetMapping("/insertDummyBoard")
-    public String dummyBoard(){
-        boardService.makeDummyBoard();
-        return "redirect:/main";
-    }*/
 
 }

@@ -14,10 +14,11 @@
     <div class="col-md-8">
       <div class="card">
         <div class="card-header">
-          <h4 class="card-title">게시굴 수정</h4>
+          <h4 class="card-title">게시글 수정</h4>
         </div>
         <div class="card-body">
-          <form th:action="@{/board/modify/{boardId}(boardId = ${boardUpdateRequest.getBoardViewDto().boardId})}" th:object="${boardUpdateRequest}" method="post" enctype="multipart/form-data">
+          <form th:action="@{/board/modify/{boardId}(boardId = ${boardUpdateRequest.getBoardViewDto().boardId})}" th:object="${boardUpdateRequest}"
+                method="post" enctype="multipart/form-data">
             <input type="hidden" th:field="*{boardViewDto.username}">
             <input type="hidden" th:field="*{boardViewDto.boardId}">
             <div class="form-group">

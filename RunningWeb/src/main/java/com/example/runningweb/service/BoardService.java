@@ -9,7 +9,6 @@ import com.example.runningweb.dto.BoardUpdateRequest;
 import com.example.runningweb.dto.BoardViewDto;
 import com.example.runningweb.repository.BoardRepository;
 import com.example.runningweb.repository.FileRepository;
-import com.example.runningweb.repository.MemberRepository;
 import com.example.runningweb.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,16 +39,13 @@ public class BoardService {
     private final FileRepository fileRepository;
     private final CommentService commentService;
     private final FileUtil fileUtil;
-    private final MemberRepository memberRepository;
 
     /**
      * 파일을 만들려다가 실패하는 경우 이전파일을 삭제 해야함
      * --> 일단 파일은 하나만 저장이 가능하므로 추후 개발
      */
-    // Checked Exception은
     @Transactional(rollbackFor = {IOException.class})
     public Long createBoard(BoardDto boardDto, Member member) {
-
         // board 생성
         Board board = Board.builder()
                 .title(boardDto.getTitle())
@@ -94,9 +90,10 @@ public class BoardService {
     //추후 페이징 처리 필요함.
     public List<BoardListDto> boardList(Integer pageNum) {
         Pageable paging = PageRequest
-                .of(pageNum - 1, PAGE_SIZE, Sort.by("createdAt").descending());
+                .of(pageNum - 1, PAGE_SIZE, Sort.by("id").descending());
 
         Page<Board> pagingBoards = boardRepository.findByPagingBoard(paging);
+
         if(pagingBoards.getTotalPages() < pageNum-1) {
             throw new IllegalArgumentException("너무 큰 페이지 번호입니다.");
         }
@@ -180,19 +177,4 @@ public class BoardService {
 
     }
 
-    public void makeDummyBoard() {
-        Member member = memberRepository.findById(1L).get();
-        List<Board> dummies = new ArrayList<>();
-        for(int i=1; i<=100; i++){
-            Board board = Board.builder()
-                    .title(String.valueOf(i))
-                    .content(String.valueOf(i))
-                    .writer(member.getNickname())
-                    .build();
-
-            board.updateWriter(member);
-            dummies.add(board);
-        }
-        boardRepository.saveAll(dummies);
-    }
 }

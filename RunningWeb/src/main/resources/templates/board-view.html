@@ -67,6 +67,7 @@
   var userId = /*[[${loginId}]]*/ -1;
   var csrf_token = $("meta[name='_csrf']").attr("content");
   var csrf_header = $("meta[name='_csrf_header']").attr("content");
+  var isAuthenticated = userId !== -1; //로그인 유무
 
   console.log(userId)
 
@@ -101,16 +102,18 @@
   function renderComments(comments) {
     let commentList = $(`#comment-list`);
     commentList.empty();
-    let commenthtml = comments.map(createCommentHTML).join('');
+    let commenthtml = comments.map(comment => createCommentHTML(comment)).join('');
     commentList.append(commenthtml);
     addEventListeners();
   }
 
-  function createCommentHTML(comment) {
+  function createCommentHTML(comment, depth = 0) {
     const formattedDate = formatDate(comment.wroteAt);
     const isOwner = userId === comment.writer_id;
-    return `
-    <div class="list-group-item" id="${comment.comment_id}">
+    const marginLeft = depth * 20; // 들여쓰기를 위한 마진 계산
+
+    let html = `
+    <div class="list-group-item" id="${comment.comment_id}" style="margin-left: ${marginLeft}px;">
       <div class="d-flex justify-content-between">
         <span>
           ${comment.writer}
@@ -120,8 +123,31 @@
       </div>
       <p class="mt-2 comment-content" id="content-${comment.comment_id}">${comment.content}</p>
       ${isOwner ? createEditArea(comment) : ''}
+                ${userId !== null ? `
+              <button class="btn btn-sm btn-info replyBtn" data-comment-id="${comment.comment_id}">답글</button>
+              <div class="reply-area" style="display:none;">
+                <textarea class="form-control reply-textarea" placeholder="답글을 입력하세요"></textarea>
+                <button class="btn btn-sm btn-primary mt-2 saveReplyBtn" data-comment-id="${comment.comment_id}">답글 저장</button>
+                <button class="btn btn-sm btn-secondary mt-2 cancelReplyBtn">취소</button>
+              </div>
+            ` : ''}
     </div>
   `;
+
+    // 대댓글 처리
+    if (comment.child && comment.child.length > 0) {
+      html += createChildCommentHTML(comment.child, depth + 1);
+    }
+
+    return html;
+  }
+
+  function createChildCommentHTML(childComments, depth) {
+    let html = '';
+    for (let childComment of childComments) {
+      html += createCommentHTML(childComment, depth);
+    }
+    return html;
   }
 
   function formatDate(dateString) {
@@ -151,6 +177,44 @@
     $('.cancelBtn').on('click', handleCancel);
     $('.saveBtn').on('click', handleSave);
     $('.deleteBtn').on('click', handleDelete);
+    $('.replyBtn').on('click', handleReplyClick);
+    $('.cancelReplyBtn').on('click', handleReplyCancel);
+    $('.saveReplyBtn').on('click', handleReplySave);
+  }
+
+  function handleReplyClick() {
+    const commentId = $(this).data('comment-id');
+    $(this).siblings('.reply-area').show();
+  }
+
+  function handleReplyCancel() {
+    $(this).closest('.reply-area').hide();
+  }
+
+  function handleReplySave() {
+    const commentId = $(this).data('comment-id');
+    const replyContent = $(this).siblings('.reply-textarea').val();
+    console.log(JSON.stringify({content:replyContent, parentId: commentId}))
+    $.ajax({
+      url: `/comment/${boardId}`,
+      type: 'POST',
+      beforeSend: function(request){
+        request.setRequestHeader(csrf_header, csrf_token)
+      },
+      data: JSON.stringify({
+        content: replyContent,
+        parentId: commentId
+      }),
+      contentType: 'application/json',
+      success: function(){
+        loadComments(); // 댓글 재갱신
+        $('.reply-area').hide();
+        $('.reply-textarea').val('');
+      },
+      error: function(request, status, error){
+        alert("code:"+ request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+      }
+    });
   }
 
   function handleEdit() {
@@ -214,7 +278,7 @@
       beforeSend: function(request){
         request.setRequestHeader(csrf_header, csrf_token)
       },
-      data: JSON.stringify({content: content}),
+      data: JSON.stringify({content: content, parentId:-1}),
       contentType: 'application/json',
       success: function(){
         loadComments(); //댓글 재갱신

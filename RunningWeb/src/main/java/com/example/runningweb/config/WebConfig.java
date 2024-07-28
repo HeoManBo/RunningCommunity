@@ -2,10 +2,11 @@ package com.example.runningweb.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-//@Configuration
+@Configuration
 public class WebConfig implements WebMvcConfigurer {
 
     @Value("${spring.main.page}")
@@ -15,6 +16,12 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
         registry.addRedirectViewController("/", mainPage);
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/attach/images/**") //웹에서 접근할 경로
+                .addResourceLocations("file:///C:/upload/"); //실제 파일 위치
     }
 
 }

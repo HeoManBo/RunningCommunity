@@ -15,7 +15,7 @@
   <title>채팅방 목록</title>
 </head>
 <body>
-<header th:replace="~{/fragment/header.html}" ></header>
+<header th:replace="~{fragment/header.html}" ></header>
 <div class="container" id="app" v-cloak>
   <hr>
   <div class="row">
@@ -87,7 +87,8 @@
       regions: [{name : "지역" , value:""},
         {name : "서울" , value:"서울"},
         {name : "대구" , value:"대구"},
-        {name : "부산" , value:"부산"}]
+        {name : "부산" , value:"부산"},
+        {name : "오산",  value: "오산"}]
     },
     created() {
       this.findAllRoom(null);
@@ -97,7 +98,10 @@
         // var params = new URLSearchParams();
         // console.log(this.searchRegion);
         // params.append("region", this.searchRegion);
-        // axios.get('/chat/rooms', params) -> 해당 요청은 requestParam 이 안찍힘;
+        // axios.get('/chat/rooms', params).then(response => {
+        //   allRoom = true
+        //   this.chatrooms = response.data;
+        // });
         axios.get('/chat/rooms', {
           params: {
             region: this.searchRegion
@@ -152,7 +156,7 @@
         this.selectedRegion = event.target.value;
       },
       setSearchRegion(event){
-        this.searchRegion = event.target.value;
+
         this.findAllRoom();
       }
     }

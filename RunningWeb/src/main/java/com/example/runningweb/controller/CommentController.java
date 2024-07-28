@@ -1,5 +1,6 @@
 package com.example.runningweb.controller;
 
+import com.example.runningweb.dto.CommentCreateRequest;
 import com.example.runningweb.dto.CommentDto;
 import com.example.runningweb.dto.UpdateCommentRequest;
 import com.example.runningweb.security.MemberUserDetails;
@@ -26,14 +27,14 @@ public class CommentController {
     @GetMapping("/comment/{boardId}")
     @ResponseBody
     public List<CommentDto> commentList(@PathVariable(name = "boardId") Long boardId){
-        return commentService.commentDtos(boardId);
+        return commentService.getCommentsWithHier(boardId);
     }
 
     //비동기형으로 댓글 등록
     @ResponseBody
     @PostMapping("/comment/{boardId}")
     public ResponseEntity<Void> makeComment(@PathVariable("boardId") Long boardId,
-                                              @RequestBody CommentDto commentDto,
+                                              @RequestBody CommentCreateRequest commentDto,
                                               @AuthenticationPrincipal MemberUserDetails memberUserDetails){
 
         log.info("댓글 내용 : {}", commentDto.getContent());
