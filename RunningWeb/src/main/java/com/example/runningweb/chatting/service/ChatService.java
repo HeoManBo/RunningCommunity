@@ -11,6 +11,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -19,17 +21,6 @@ public class ChatService {
     private final RedisTemplate<String, Object> template;
     private final RedisChatRoomRepository roomRepository;
     private final MessageService messageService;
-
-    /**
-     * destination 정보에서 roomId 추출
-     */
-    public String getRoomId(String destination)
-    {
-        int lastIndex = destination.lastIndexOf('/');
-        if(lastIndex != -1){
-            return destination.substring(lastIndex+1); //roomId 추출
-        }else return "";
-    }
 
     /**
      * 채팅방에 메세지 전송 (pub)
@@ -43,9 +34,10 @@ public class ChatService {
             chattingMessage.setMessage(chattingMessage.getSender() + "님이 방에서 퇴장했습니다.");
             chattingMessage.setSender("[알림] ");
         }
-
+        chattingMessage.setSendAt(LocalDateTime.now());
         messageService.saveMessage(chattingMessage, member);
-        //메시지 전송
+
+        //redis에 메세지 발행
         template.convertAndSend(topic.getTopic(), chattingMessage);
     }
 }
