@@ -21,36 +21,20 @@ import java.security.Principal;
 @Slf4j
 public class MessageSendController {
 
-    // /pub/chat/message 로 발행된 문자를 처리하여 구독자에게 전송한다.
-    // 구독자는 웹단에서 /sub/chat/room/{roomId}를 구독하면 된다.
-//    @MessageMapping("/chat/message")
-//    public void message(ChattingMessage message){
-//        log.info("채팅방 입장 타입 = {}", message.getType().toString());
-//        if (message.getType().equals(MessageType.ENTER)) {
-//            message.setMessage(message.getSender() + "님이 입장하였습니다."); //입장시 메세지 설정
-//        }
-//        log.info("전송된 문자 = {}", message.getMessage());
-//        // /sub/chat/room/{roomId} 채팅방에 있는 사람들에게 메세지 보내기
-//        messagingTemplate.convertAndSend("/sub/chat/room/" + message.getRoomId(), message);
-//    }
-
-
     private final ChatService chatService;
-    private final RedisChatRoomRepository chatRoomRepository;
-
 
     /**
      * /pub/chat/message 로 들어온 메세지를 처리
+     * principal : websocket handshake시 시점에 로그인 유저 정보
      */
     @MessageMapping("/chat/message")
     public void message(ChattingMessage message, Principal principal) {
         String username = getUsername(principal);
-
         message.setSender(username);
-        message.setUserCount(chatRoomRepository.getUserCount(message.getRoomId()));
+
         Member member = Utils.extractLoginMember(principal);
         if(member == null) throw new IllegalArgumentException("잘못된 메세지 전송");
-        // redis로 발행
+        // redis로 메세지 발행
         chatService.sendChatMessage(message, member);
     }
 

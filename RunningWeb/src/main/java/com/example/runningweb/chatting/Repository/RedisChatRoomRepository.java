@@ -31,7 +31,6 @@ public class RedisChatRoomRepository {
     private ValueOperations<String, String> valueOps;
 
     private final ChattingRoomService roomService;
-    private final EnteredRoomService enteredRoomService;
 
     //모든 채팅방 조회
     public List<RedisChattingRoom> findAllRoom() {
@@ -49,6 +48,7 @@ public class RedisChatRoomRepository {
         RedisChattingRoom redisChattingRoom = new RedisChattingRoom(name, region);
 
         opsHashChatRoom.put(CHAT_ROOMS, redisChattingRoom.getRoomId(), redisChattingRoom);
+
         Long success = roomService.createChattingRoom(name, redisChattingRoom.getRoomId(), region, member);
 
         if(success == null){

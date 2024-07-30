@@ -78,13 +78,4 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-//    @Bean
-//    public WebSecurityCustomizer webSecurityCustomizer(){
-//        return (web) ->
-//        {
-//            web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
-//        };
-//    }
-
-
 }

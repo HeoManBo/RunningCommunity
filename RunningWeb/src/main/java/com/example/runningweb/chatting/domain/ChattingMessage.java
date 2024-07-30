@@ -26,7 +26,6 @@ public class ChattingMessage {
     private LocalDateTime sendAt; // 보낸 시간
 
     //입장, 퇴장시에먼 갱신해도 되지만, 수신하지 못하는 경우에도 (redis는 발행의 신뢰성을 보장하지 않음) 유저수가 갱신되도록 메시지 수신
-    //할때마다 갱신되도록 설정함.
     private long userCount;
 
     public ChattingMessage(){}
@@ -40,4 +39,5 @@ public class ChattingMessage {
         this.userCount = userCount;
         this.sendAt = sendAt;
     }
+
 }

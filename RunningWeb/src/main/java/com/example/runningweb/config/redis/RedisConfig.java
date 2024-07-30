@@ -44,7 +44,7 @@ public class RedisConfig {
     //실제 메시지를 처리하는 adaptor 설정 , publisher 역할
     @Bean
     public MessageListenerAdapter adapter(RedisSubscriberService subscriberService){
-        //메시지가 발행됐을 때 subscriberdocker Service 의 onMessage 실행됨
+        //메시지가 발행됐을 때 subscriberService 의 sendMessage 실행됨
         return new MessageListenerAdapter(subscriberService, "sendMessage");
     }
 
