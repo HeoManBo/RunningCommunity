@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{fragment/layout.html}">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{fragment/layout.html}">
+
 <head>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <meta name="_csrf" th:content="${_csrf.token}">
     <meta charset="UTF-8">
     <title>회원가입</title>
 </head>
@@ -15,37 +17,131 @@
             </div>
             <div class="form-group">
                 <label for="id">아이디 (최대 16자)</label>
-                <input type="text" class="form-control" id="id" name="id" placeholder="아이디를 입력하세요" th:field="*{id}"
-                       required>
+                <input type="text" class="form-control" id="id" name="id" placeholder="아이디를 입력하세요" th:field="*{id}" required>
             </div>
             <div class="form-group">
                 <label for="password">비밀번호</label>
-                <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요"
-                       th:field="*{password}" required>
+                <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력하세요" th:field="*{password}" required>
             </div>
             <div class="form-group">
                 <label for="password_check">비밀번호 확인</label>
-                <input type="password" class="form-control" id="password_check" name="password_check"
-                       placeholder="비밀번호를 다시 입력하세요" th:field="*{password_check}" required>
+                <input type="password" class="form-control" id="password_check" name="password_check" placeholder="비밀번호를 다시 입력하세요" th:field="*{password_check}" required>
                 <div th:if="${#fields.hasErrors('password_check')}" class="invalid-feedback">
                     비밀번호가 일치하지 않습니다.
                 </div>
             </div>
             <div class="form-group">
                 <label for="nickname">닉네임 (최대 8자)</label>
-                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="닉네임을 입력하세요"
-                       th:field="*{nickname}" required>
+                <input type="text" class="form-control" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" th:field="*{nickname}" required>
                 <div th:if="${#fields.hasErrors('nickname')}" th:errors="*{nickname}" class="invalid-feedback"></div>
             </div>
             <div class="form-group">
                 <label for="email">이메일</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요"
-                       th:field="*{email}" required>
+                <div class="input-group">
+                    <input type="email" class="form-control" id="email" name="email" placeholder="이메일을 입력하세요" th:field="*{email}" required>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-secondary" id="sendVerification">인증 메일 발송</button>
+                    </div>
+                </div>
                 <small class="form-text text-muted">아이디/비밀번호 찾기시 이용할 이메일</small>
+            </div>
+            <div class="form-group" id="verificationGroup" style="display: none;">
+                <label for="verificationCode">인증 번호</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="verificationCode" name="verificationCode" placeholder="인증 번호를 입력하세요">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-secondary" id="verifyCode">확인</button>
+                    </div>
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">가입하기</button>
         </form>
     </div>
+
+    <script>
+        var header = $("meta[name='_csrf_header']").attr('content');
+        var token = $("meta[name='_csrf']").attr('content');
+        var isEmailVerified = false;
+
+        $(document).ready(function() {
+            $('#sendVerification').click(function() {
+                const email = $('#email').val();
+                if(!email || email.trim() === ""){
+                    alert("이메일을 입력하세요")
+                    return;
+                }
+                $.ajax({
+                    url: '/checkEmail',
+                    type: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader(header, token);
+                    },
+                    data: {
+                        email: email
+                    },
+                }).done(function(result) {
+                    console.log("result : " + result);
+                    if (JSON.parse(result) === false) {
+                        sendEmailCode();
+                        alert('임시비밀번호를 전송 했습니다.');
+                    } else {
+                        alert('이미 가입된 이메일입니다.');
+                    }
+                });
+            });
+
+            $('#verifyCode').click(function() {
+                var code = $('#verificationCode').val();
+                var email = $('#email').val();
+                $.ajax({
+                    url: '/mail',
+                    type: 'GET',
+                    beforeSend: function(xhr){
+                        xhr.setRequestHeader(header, token);
+                    },
+                    data: { code: code , email: email},
+                    success: function(response) {
+                        if(response.verified) {
+                            alert('이메일이 성공적으로 인증되었습니다.');
+                            isEmailVerified = true;
+                            $('#verifyCode').removeClass('btn-secondary').addClass('btn-primary');
+                        } else {
+                            alert('인증 번호가 올바르지 않습니다. 다시 확인해주세요.');
+                            isEmailVerified = false;
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('인증 확인 중 오류가 발생했습니다. 다시 시도해주세요.');
+                    }
+                });
+            });
+        });
+
+        $('form').submit(function(e) {
+            if (!isEmailVerified) {
+                e.preventDefault();
+                alert('이메일 인증을 완료해주세요.');
+            }
+        });
+
+        function sendEmailCode(){
+            const email = $('#email').val();
+            $.ajax({
+                url: '/mail',
+                type: 'POST',
+                beforeSend: function(xhr){
+                    xhr.setRequestHeader(header, token);
+                },
+                data: { email: email },
+                success: function(response) {
+                    $('#verificationGroup').show();
+                },
+                error: function(xhr, status, error) {
+                    alert('인증 메일 발송에 실패했습니다. 다시 시도해주세요.');
+                }
+            });
+        }
+    </script>
     </body>
 </th:block>
 </html>

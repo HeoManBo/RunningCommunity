@@ -45,10 +45,9 @@ public class EnteredRoomService {
 
     // 퇴장 처리
     @Transactional
-    public int exitRoom(String roomId, Member member) {
+    public void exitRoom(String roomId, Member member) {
         ChattingRoom room = findByRoomId(roomId);
-        int result = enteredRoomRepository.exitRoom(room, member);
-        return result;
+        enteredRoomRepository.exitRoom(room, member);
     }
 
     //퇴장 저장 시간 저장
@@ -95,4 +94,6 @@ public class EnteredRoomService {
 
         return enteredInfo.get(0);
     }
+
+
 }

@@ -18,7 +18,6 @@ public class Message extends BaseEntity {
 
     private String message; //전송한 메세지
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member writer;
@@ -26,7 +25,6 @@ public class Message extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatting_room_id")
     private ChattingRoom chattingRoom; //메세지 전송한 채팅방
-
 
     @Builder
     public Message(String message, Member writer, ChattingRoom chattingRoom) {

@@ -48,7 +48,6 @@ public class ChatRoomController {
     @GetMapping("/rooms")
     @ResponseBody
     public List<RedisChattingRoom> allRoom(@RequestParam(name = "region", required = false) String region) {
-        log.info("선택한 지역 = {}", region);
         List<RedisChattingRoom> chatRooms = chatRoomRepository.findAllRoom();
         chatRooms.forEach(redisChattingRoom -> redisChattingRoom.
                 setUserCount(chatRoomRepository.getUserCount(redisChattingRoom.getRoomId())));

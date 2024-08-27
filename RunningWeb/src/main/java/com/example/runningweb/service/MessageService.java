@@ -59,7 +59,7 @@ public class MessageService {
         List<MessageHistoryResponse> result = new ArrayList<>();
         boolean first = true;
         for(Message message : messages){
-            String date = dateFormatter.format(message.getCreatedAt().minusDays(20));
+            String date = dateFormatter.format(message.getCreatedAt());
             if(message.getCreatedAt().isAfter(exitTime)){
                 if(first){
                     first = false;
@@ -72,7 +72,6 @@ public class MessageService {
             else result.add(new MessageHistoryResponse(message.getWriter().getNickname(), message.getMessage(), date));
         }
 
-        //다시 역순으로..????
         Collections.reverse(result);
 
         return result;

@@ -8,19 +8,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @Slf4j
@@ -28,7 +26,12 @@ import java.util.Objects;
 public class MemberController {
 
     private final MemberService memberService;
-   // private final AuthenticationManager manager;
+    private static final String[] NOT_PREV_RETURN = {"login", "findPassword"};
+
+    @GetMapping("favicon.ico")
+    @ResponseBody
+    public void returnNoFavicon() {
+    }
 
     //회원가입 폼
     @GetMapping("/signup")
@@ -37,11 +40,20 @@ public class MemberController {
         return "/signup";
     }
 
+    @GetMapping("/findId")
+    public String findId() {
+        return "/findId";
+    }
+
+    @GetMapping("/findPassword")
+    public String findPassword() {
+        return "/findPassword";
+    }
+
     //회원가입 진행
     @PostMapping("/signup")
     public String signUpMember(@Valid @ModelAttribute("memberDto") MemberDto memberDto,
                                BindingResult bindingResult) {
-
         if (bindingResult.hasErrors()) {
             return "signup";
         }
@@ -72,7 +84,7 @@ public class MemberController {
         String prevUrl = (String) request.getHeader("Referer");
         //만약 이전 페이지의 요청이 있고, 이전 페이지가 /login이 아니라면 이동
         // referer 페이지로 이동, 만약 login 실패하고 성공하면 다시 /login으로 redirect 되기때문에 /login 인 경우는 제외함.
-        if (prevUrl != null && !prevUrl.contains("/login")) {
+        if (prevUrl != null && Arrays.asList(NOT_PREV_RETURN).contains(prevUrl)) {
             request.getSession().setAttribute("prevUrl", prevUrl);
         }
 

@@ -21,7 +21,7 @@ public interface EnteredRoomRepository extends JpaRepository<EnteredRoom, Long> 
 
     @Modifying
     @Query("delete from EnteredRoom er where er.chattingRoom = :room and er.member = :member")
-    int exitRoom(@Param("room") ChattingRoom room, @Param("member") Member member);
+    void exitRoom(@Param("room") ChattingRoom room, @Param("member") Member member);
 
     @Modifying
     @Query("update EnteredRoom er set er.updatedAt = now() where er.chattingRoom = :room and er.member = :member")
