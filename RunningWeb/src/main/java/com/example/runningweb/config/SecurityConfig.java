@@ -30,8 +30,9 @@ public class SecurityConfig {
 //    };
 
     private static final String[] permitAllList = {
-            "/webjars/**", "/favicon.ico", "/main", "/signup", "/login", "/error**", "/logout", "/css/**",
-            "/board/**", "/images/**", "/comment/**", "/", "/resources/**", "/attach/**"
+            "/webjars/**", "/favicon.ico", "/main", "/signup**", "/login", "/error**", "/logout", "/css/**",
+            "/board/**", "/images/**", "/comment/**", "/", "/resources/**", "/attach/**", "/mail",
+            "/findId", "/findId/**", "/findPassword", "/checkEmail"
     };
 
     private static final String[] authenticationList = {
