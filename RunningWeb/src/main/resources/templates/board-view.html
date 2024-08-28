@@ -56,6 +56,7 @@
   </div>
   <div id="comment-list">
   </div>
+  <button class="btn btn-primary" id='sse'></button>
 </div>
 <a class="btn btn-primary mt-2 ml-5" type="button" th:href="@{/main(page=${param.returnPage})}">
   목록으로
@@ -69,7 +70,25 @@
   var csrf_header = $("meta[name='_csrf_header']").attr("content");
   var isAuthenticated = userId !== -1; //로그인 유무
 
-  console.log(userId)
+  console.log(userId);
+
+  const sseData = document.getElementById('sse');
+  const eventSource = new EventSource('http://localhost:8080/connect/' + boardId, {withCredentials: true, });
+  var newCommentCount = 0;
+
+  eventSource.addEventListener('count', (e) => {
+    const {data : receivedConnectData} = e;
+    sseData.style.display = 'block'
+    newCommentCount += parseInt(receivedConnectData, 10);
+    sseData.textContent = '신규 댓글 보기 ' + newCommentCount
+    console.log('connect event data: ', receivedConnectData); //"connected!"
+  })
+
+  $("#sse").click(function () {
+    sseData.style.display = 'none';
+    newCommentCount = 0;
+    loadComments();
+  })
 
   $("#deleteBtn").click(function (){
     if(confirm("정말 삭제하시겠습니까?")){
@@ -91,6 +110,8 @@
   });
 
   function loadComments() {
+    sseData.style.display = 'none';
+    newCommentCount = 0;
     $.ajax({
       url: `/comment/${boardId}`,
       type: "get",

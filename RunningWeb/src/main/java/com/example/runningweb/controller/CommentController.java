@@ -2,11 +2,14 @@ package com.example.runningweb.controller;
 
 import com.example.runningweb.dto.CommentCreateRequest;
 import com.example.runningweb.dto.CommentDto;
+import com.example.runningweb.dto.CommentEvent;
 import com.example.runningweb.dto.UpdateCommentRequest;
 import com.example.runningweb.security.MemberUserDetails;
 import com.example.runningweb.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.core.ApplicationPushBuilder;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -21,6 +24,7 @@ import java.util.List;
 public class CommentController {
 
     private final CommentService commentService;
+    private final ApplicationEventPublisher publisher;
 
     // boardId에 해당하는 댓글 목록을 가져온다.
     // 비동기형 처리로 가져오므로 ResponseBody를 붙이자.
@@ -42,6 +46,8 @@ public class CommentController {
         log.info("댓글 내용 : {}", commentDto.getContent());
 
         Long result = commentService.createComment(commentDto, boardId, memberUserDetails.getMember());
+        publisher.publishEvent(new CommentEvent(String.valueOf(boardId)));
+
         return ResponseEntity.ok().build();
     }
 
@@ -54,6 +60,7 @@ public class CommentController {
         checkLoginUser(memberUserDetails);
 
         commentService.deleteComment(commentId, memberUserDetails.getMember());
+
         return ResponseEntity.ok().build();
     }
 
