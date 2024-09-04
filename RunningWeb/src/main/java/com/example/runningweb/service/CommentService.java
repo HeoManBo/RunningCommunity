@@ -6,8 +6,8 @@ import com.example.runningweb.domain.Member;
 import com.example.runningweb.dto.CommentCreateRequest;
 import com.example.runningweb.dto.CommentDto;
 import com.example.runningweb.dto.UpdateCommentRequest;
-import com.example.runningweb.repository.BoardRepository;
-import com.example.runningweb.repository.CommentRepository;
+import com.example.runningweb.repository.mysql.BoardRepository;
+import com.example.runningweb.repository.mysql.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -112,5 +112,8 @@ public class CommentService {
             throw new IllegalArgumentException("다른 사람의 댓글을 조작할 수 없습니다.");
         }
     }
+
+
+
 
 }

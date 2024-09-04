@@ -1,4 +1,4 @@
-package com.example.runningweb.repository;
+package com.example.runningweb.repository.mysql;
 
 import com.example.runningweb.domain.Board;
 import org.springframework.data.domain.Page;

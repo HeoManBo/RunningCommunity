@@ -58,7 +58,7 @@ public class SseEmitters {
         if (sseEmitters == null || sseEmitters.size() == 0) {
             return;
         }
-        log.info("ASDSADASDAD");
+
         sseEmitters.forEach(emitter -> {
             try {
                 emitter.send(SseEmitter.event()

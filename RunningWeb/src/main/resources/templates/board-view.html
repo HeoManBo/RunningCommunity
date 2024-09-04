@@ -69,11 +69,10 @@
   var csrf_token = $("meta[name='_csrf']").attr("content");
   var csrf_header = $("meta[name='_csrf_header']").attr("content");
   var isAuthenticated = userId !== -1; //로그인 유무
-
-  console.log(userId);
+  const port = [[${serverPort}]]
 
   const sseData = document.getElementById('sse');
-  const eventSource = new EventSource('http://localhost:8080/connect/' + boardId, {withCredentials: true, });
+  const eventSource = new EventSource(`http://localhost:${port}/connect/${boardId}`, {withCredentials: true, });
   var newCommentCount = 0;
 
   eventSource.addEventListener('count', (e) => {
