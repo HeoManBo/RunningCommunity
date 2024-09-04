@@ -2,13 +2,12 @@ package com.example.runningweb.security;
 
 
 import com.example.runningweb.domain.Member;
-import com.example.runningweb.repository.MemberRepository;
+import com.example.runningweb.repository.mysql.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 /**

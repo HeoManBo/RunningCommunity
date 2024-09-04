@@ -1,4 +1,4 @@
-package com.example.runningweb.repository;
+package com.example.runningweb.repository.mysql;
 
 import com.example.runningweb.domain.ChattingRoom;
 import com.example.runningweb.domain.Member;

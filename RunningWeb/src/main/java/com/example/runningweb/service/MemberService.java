@@ -5,7 +5,7 @@ import com.example.runningweb.domain.Member;
 import com.example.runningweb.dto.MemberDto;
 import com.example.runningweb.dto.UpdateMemberPasswordRequest;
 import com.example.runningweb.dto.UpdateMemberRequest;
-import com.example.runningweb.repository.MemberRepository;
+import com.example.runningweb.repository.mysql.MemberRepository;
 import com.example.runningweb.util.RandomEmailCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

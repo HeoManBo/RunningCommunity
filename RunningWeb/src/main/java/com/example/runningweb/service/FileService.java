@@ -1,6 +1,6 @@
 package com.example.runningweb.service;
 
-import com.example.runningweb.repository.FileRepository;
+import com.example.runningweb.repository.mysql.FileRepository;
 import com.example.runningweb.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

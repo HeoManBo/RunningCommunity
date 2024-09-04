@@ -9,6 +9,7 @@ import com.example.runningweb.security.MemberUserDetail;
 import com.example.runningweb.security.MemberUserDetails;
 import com.example.runningweb.service.BoardService;
 import com.example.runningweb.util.FileUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -67,10 +68,15 @@ public class BoardController {
     // 게시판 조회
     @GetMapping("/board/{boardId}")
     public String viewBoard(@PathVariable("boardId") Long boardId, Model model,
-                            @AuthenticationPrincipal MemberUserDetails userDetails) {
-        if(userDetails == null){ //비 로그인 상태
+                            @AuthenticationPrincipal MemberUserDetails userDetails,
+                            HttpServletRequest request) {
+
+        int serverPort = request.getServerPort();
+        model.addAttribute("serverPort", serverPort); // 다중 스프링 환경에서 SSE 포트를 지정해줘야함
+
+        if (userDetails == null) { //비 로그인 상태
             model.addAttribute("loginId", -1);
-        }else{ //로그인 상태
+        } else { //로그인 상태
             model.addAttribute("loginId", userDetails.getMember().getId());
         }
 

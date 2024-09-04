@@ -4,15 +4,13 @@ import com.example.runningweb.domain.ChattingRoom;
 import com.example.runningweb.domain.EnteredRoom;
 import com.example.runningweb.domain.Member;
 import com.example.runningweb.dto.AttendingRoomRequest;
-import com.example.runningweb.repository.ChattingRoomRepository;
-import com.example.runningweb.repository.EnteredRoomRepository;
+import com.example.runningweb.repository.mysql.ChattingRoomRepository;
+import com.example.runningweb.repository.mysql.EnteredRoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

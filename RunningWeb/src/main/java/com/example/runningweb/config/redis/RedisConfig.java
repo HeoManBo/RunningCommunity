@@ -1,5 +1,6 @@
 package com.example.runningweb.config.redis;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -9,6 +10,9 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.ThreadPoolExecutor;
 
 
 /**
@@ -19,10 +23,16 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    //단일 Topic 사용
+    //채팅 메세지를 구독하는 Topic
     @Bean
-    public ChannelTopic channelTopic(){
+    public ChannelTopic chattingMessageTopic(){
         return new ChannelTopic("chatroom");
+    }
+
+    //댓글 갱신을 구독하는 topic
+    @Bean
+    public ChannelTopic commentTopic(){
+        return new ChannelTopic("comment");
     }
 
     /**
@@ -33,11 +43,24 @@ public class RedisConfig {
      */
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory,
-                                                                       MessageListenerAdapter adapter,
-                                                                       ChannelTopic topic){
+                                                                       @Qualifier("adapter") MessageListenerAdapter adapter,
+                                                                       @Qualifier("commentAdapter") MessageListenerAdapter commentAdapter,
+                                                                       @Qualifier("chattingMessageTopic") ChannelTopic chatTopic,
+                                                                       @Qualifier("commentTopic") ChannelTopic commentTopic) {
+
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(8);
+        executor.setThreadNamePrefix("redisThread-");
+        executor.setQueueCapacity(1024);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy()); //못보낼 경우 직접 전송하도록
+        executor.initialize();
+
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
-        container.addMessageListener(adapter, topic);
+        container.addMessageListener(adapter, chatTopic);
+        container.addMessageListener(commentAdapter, commentTopic);
+        container.setTaskExecutor(executor);
+
         return container;
     }
 
@@ -46,6 +69,11 @@ public class RedisConfig {
     public MessageListenerAdapter adapter(RedisSubscriberService subscriberService){
         //메시지가 발행됐을 때 subscriberService 의 sendMessage 실행됨
         return new MessageListenerAdapter(subscriberService, "sendMessage");
+    }
+
+    @Bean
+    public MessageListenerAdapter commentAdapter(RedisCommentSubscriberService redisCommentSubscriberService) {
+        return new MessageListenerAdapter(redisCommentSubscriberService, "sendNewCommentAlert");
     }
 
     /**
@@ -59,5 +87,6 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
         return redisTemplate;
     }
+
 
 }
