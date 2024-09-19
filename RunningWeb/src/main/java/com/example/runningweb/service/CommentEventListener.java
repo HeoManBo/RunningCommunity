@@ -1,6 +1,8 @@
 package com.example.runningweb.service;
 
 import com.example.runningweb.dto.CommentEvent;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,25 +16,25 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommentEventListener {
 
-    private final SseEmitters sseEmitters;
     private final ChannelTopic commentTopic;
     private final RedisTemplate<String, Object> template;
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public CommentEventListener(SseEmitters sseEmitters,
-                                @Qualifier("commentTopic") ChannelTopic channelTopic,
+
+    public CommentEventListener(@Qualifier("commentTopic") ChannelTopic channelTopic,
                                 RedisTemplate<String, Object> redisTemplate) {
-        this.sseEmitters = sseEmitters;
         this.commentTopic = channelTopic;
         this.template = redisTemplate;
     }
 
     @EventListener
     @Async("commentAsyncExecutors")
-    public void sendCommentEvent(CommentEvent commentEvent) throws InterruptedException {
+    public void sendCommentEvent(CommentEvent commentEvent) throws InterruptedException, JsonProcessingException {
         //sseEmitters.sendNewCommentCount(commentEvent.getBoardId());
-        log.info("토픽 = {}, 전송하는 게시판 번호 = {}", commentTopic.getTopic(), commentEvent.getBoardId());
-        template.convertAndSend(commentTopic.getTopic(), commentEvent.getBoardId());
+        String s = objectMapper.writeValueAsString(commentEvent);
+        log.info("토픽 = {}, 전송하는 게시판 번호 = {}", commentTopic.getTopic(), s);
+        template.convertAndSend(commentTopic.getTopic(), commentEvent);
     }
 
 

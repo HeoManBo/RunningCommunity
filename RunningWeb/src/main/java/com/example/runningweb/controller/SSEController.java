@@ -22,7 +22,7 @@ public class SSEController {
 
     @GetMapping(value = "/connect/{boardId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> connect(@PathVariable("boardId") String boardId) {
-        SseEmitter emitter = new SseEmitter(Duration.ofMinutes(6).toMillis()); // 10분동안 연결 후 재접속
+        SseEmitter emitter = new SseEmitter(Duration.ofMinutes(1).toMillis()); // 10분동안 연결 후 재접속
         sseEmitters.add(emitter, boardId);
         try {
             emitter.send(SseEmitter.event()

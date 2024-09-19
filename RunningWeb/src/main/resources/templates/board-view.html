@@ -64,8 +64,8 @@
 </body>
 
 <script th:inline="javascript">
-  var boardId = [[${boardViewDto.boardId}]]
-  var userId = /*[[${loginId}]]*/ -1;
+  const boardId = [[${boardViewDto.boardId}]];
+  const userId = [[${loginId}]];
   var csrf_token = $("meta[name='_csrf']").attr("content");
   var csrf_header = $("meta[name='_csrf_header']").attr("content");
   var isAuthenticated = userId !== -1; //로그인 유무
@@ -77,9 +77,11 @@
 
   eventSource.addEventListener('count', (e) => {
     const {data : receivedConnectData} = e;
-    sseData.style.display = 'block'
-    newCommentCount += parseInt(receivedConnectData, 10);
-    sseData.textContent = '신규 댓글 보기 ' + newCommentCount
+    if(userId != receivedConnectData){
+      sseData.style.display = 'block'
+      newCommentCount += 1;
+      sseData.textContent = '신규 댓글 보기 ' + newCommentCount
+    }
     console.log('connect event data: ', receivedConnectData); //"connected!"
   })
 

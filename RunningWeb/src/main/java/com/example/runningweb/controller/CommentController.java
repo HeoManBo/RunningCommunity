@@ -46,7 +46,7 @@ public class CommentController {
         log.info("댓글 내용 : {}", commentDto.getContent());
 
         Long result = commentService.createComment(commentDto, boardId, memberUserDetails.getMember());
-        publisher.publishEvent(new CommentEvent(String.valueOf(boardId)));
+        publisher.publishEvent(new CommentEvent(String.valueOf(boardId), String.valueOf(memberUserDetails.getMember().getId())));
 
         return ResponseEntity.ok().build();
     }

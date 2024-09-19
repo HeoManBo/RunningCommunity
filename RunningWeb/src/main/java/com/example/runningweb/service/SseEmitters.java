@@ -43,17 +43,19 @@ public class SseEmitters {
         log.info("new emitter added: {}", emitter);
         emitter.onCompletion(() -> {
             log.info("onCompletion callback");
-            sseEmitters.remove(emitter);    // 만료되면 리스트에서 삭제
+            sseEmitters.remove(emitter); // 만료되면 리스트에서 삭제
+            emitter.complete();
         });
         emitter.onTimeout(() -> {
             log.info("onTimeout callback");
+            sseEmitters.remove(emitter); // 만료되면 리스트에서 삭제
             emitter.complete();
         });
 
         return emitter;
     }
 
-    public void sendNewCommentCount(String boardId) {
+    public void sendNewCommentCount(String boardId, String memberId) {
         List<SseEmitter> sseEmitters = emitterMap.get(boardId);
         if (sseEmitters == null || sseEmitters.size() == 0) {
             return;
@@ -63,10 +65,9 @@ public class SseEmitters {
             try {
                 emitter.send(SseEmitter.event()
                         .name("count")
-                        .data(1));
+                        .data(memberId));
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new RuntimeException(e);
             }
         });
     }
